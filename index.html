@@ -442,7 +442,8 @@
                     ...metrics
                 }));
 
-                renderTable();
+                // Сортируем по Sharpe Ratio (начальная сортировка)
+                sortData('sharpe');
                 document.getElementById('coinCount').textContent = metricsData.length;
                 updateDescription('sharpe'); // Показываем начальное описание
             } catch (error) {
