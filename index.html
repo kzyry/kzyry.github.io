@@ -307,6 +307,7 @@
             <div class="tab" data-sort="correlation">По корреляции</div>
             <div class="tab" data-sort="volatility">По волатильности</div>
             <div class="tab" data-sort="beta">По Beta</div>
+            <div class="tab" data-sort="maxdd">По Max DD</div>
         </div>
 
         <div class="description-box" id="descriptionBox">
@@ -401,6 +402,23 @@
                     </ul>
                     <p><strong>Применение:</strong> Высокая Beta — для агрессивных трейдеров, желающих усилить движения рынка. Низкая Beta — для консервативных инвесторов, снижающих риск.</p>
                 `
+            },
+            maxdd: {
+                title: 'Maximum Drawdown (Max DD) - Максимальная просадка',
+                content: `
+                    <p><strong>Что это:</strong> Показывает самое большое падение цены монеты от её исторического максимума до минимума за последний год. Это ваш максимальный возможный убыток, если бы вы купили на пике.</p>
+                    <p><strong>Пример:</strong> Монета стоила $100 (пик), упала до $40 (дно) → Max DD = -60%. Вы могли потерять 60% вложений в худший момент.</p>
+                    <p><strong>Как читать:</strong></p>
+                    <ul>
+                        <li><span style="color: #10b981;">Max DD -10% до 0%</span> — очень стабильная монета, минимальные просадки (низкий риск)</li>
+                        <li><span style="color: #3b82f6;">Max DD -20% до -30%</span> — умеренные просадки, приемлемый риск</li>
+                        <li><span style="color: #f59e0b;">Max DD -40% до -60%</span> — сильные падения, высокий риск</li>
+                        <li><span style="color: #ef4444;">Max DD -70% и ниже</span> — экстремальные просадки, очень высокий риск</li>
+                    </ul>
+                    <p><strong>Психологический тест:</strong> Спросите себя: "Смогу ли я спокойно спать, если мои $10,000 превратятся в $3,000 (при Max DD -70%)?" Если нет — выбирайте монеты с меньшим Max DD.</p>
+                    <p><strong>Применение:</strong> Max DD помогает оценить психологический комфорт инвестиций. Монеты с низким Max DD (-10%, -20%) подходят для консервативных инвесторов. Высокий Max DD (-60%, -80%) — только для тех, кто готов к сильным эмоциональным качелям.</p>
+                    <p><strong>Сортировка:</strong> Таблица отсортирована от наименьшей просадки (самые стабильные монеты) к наибольшей (самые рискованные).</p>
+                `
             }
         };
 
@@ -473,7 +491,8 @@
                 sharpe: (a, b) => b.sharpe_ratio - a.sharpe_ratio,
                 correlation: (a, b) => Math.abs(a.correlation) - Math.abs(b.correlation),
                 volatility: (a, b) => a.annual_volatility - b.annual_volatility,
-                beta: (a, b) => Math.abs(b.beta) - Math.abs(a.beta)
+                beta: (a, b) => Math.abs(b.beta) - Math.abs(a.beta),
+                maxdd: (a, b) => b.max_drawdown - a.max_drawdown  // От меньшей просадки к большей
             };
 
             metricsData.sort(sortFunctions[sortBy]);
