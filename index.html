@@ -647,7 +647,6 @@
         // Рендер таблицы
         function renderTable(filter = '') {
             const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
 
             let filteredData = metricsData;
             if (filter) {
@@ -657,9 +656,10 @@
                 );
             }
 
-            filteredData.forEach((coin, index) => {
+            // Собираем все строки в массив, затем одним разом вставляем
+            const rows = filteredData.map((coin, index) => {
                 const logoHtml = coin.logo ? `<img src="${coin.logo}" alt="${coin.symbol}" class="coin-logo">` : '';
-                const row = `
+                return `
                     <tr>
                         <td>${index + 1}</td>
                         <td>
@@ -680,8 +680,10 @@
                         <td class="number" data-col="maxdd">${formatPercent(coin.max_drawdown)}</td>
                     </tr>
                 `;
-                tbody.innerHTML += row;
             });
+
+            // Одна операция вместо 77
+            tbody.innerHTML = rows.join('');
         }
 
         // Обработчики событий
