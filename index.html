@@ -173,6 +173,13 @@
             object-fit: cover;
         }
 
+        .coin-rank {
+            color: #666;
+            font-size: 0.85em;
+            font-weight: 400;
+            margin-left: 8px;
+        }
+
         .badge {
             display: inline-block;
             padding: 2px 8px;
@@ -659,6 +666,7 @@
             // Собираем все строки в массив, затем одним разом вставляем
             const rows = filteredData.map((coin, index) => {
                 const logoHtml = coin.logo ? `<img src="${coin.logo}" alt="${coin.symbol}" class="coin-logo">` : '';
+                const rankHtml = coin.rank ? `<span class="coin-rank">#${coin.rank}</span>` : '';
                 return `
                     <tr>
                         <td>${index + 1}</td>
@@ -666,6 +674,7 @@
                             <div class="coin-name">
                                 ${logoHtml}
                                 <span>${coin.symbol}</span>
+                                ${rankHtml}
                             </div>
                         </td>
                         <td class="number" data-col="sharpe">${formatSharpe(coin.sharpe_ratio)}</td>
