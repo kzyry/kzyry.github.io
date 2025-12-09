@@ -13,7 +13,8 @@
     "avg_daily_return": 0.07623575359738997,
     "old_correlation": 0.14327873192709706,
     "old_sharpe": 0.05246721522267808,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/15458/small/ryyrCapt_400x400.jpg?1696515105"
   },
   "BNB": {
     "name": "BNB",
@@ -29,7 +30,8 @@
     "avg_daily_return": 0.10990928153020468,
     "old_correlation": -0.49139205373375955,
     "old_sharpe": -0.18045488097837195,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/825/small/bnb-icon2_2x.png?1696501970"
   },
   "TRX": {
     "name": "TRON",
@@ -45,7 +47,8 @@
     "avg_daily_return": 0.04313550256792956,
     "old_correlation": -0.7920280668809062,
     "old_sharpe": -0.1822978001073499,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/69612/small/trx.png?1759221091"
   },
   "DOGE": {
     "name": "Dogecoin",
@@ -61,7 +64,8 @@
     "avg_daily_return": -0.17219741094979352,
     "old_correlation": 0.3741529255584526,
     "old_sharpe": 0.12592514146690267,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/15768/small/dogecoin.png?1696515392"
   },
   "ADA": {
     "name": "Cardano",
@@ -77,7 +81,8 @@
     "avg_daily_return": -0.07762661867747513,
     "old_correlation": 0.3522049670426688,
     "old_sharpe": 0.1103334407547272,
-    "old_appearances": 40
+    "old_appearances": 40,
+    "logo": "https://coin-images.coingecko.com/coins/images/15455/small/ZE8LxNBf_400x400.jpg?1696515099"
   },
   "WBT": {
     "name": "WhiteBIT Coin",
@@ -93,7 +98,8 @@
     "avg_daily_return": 0.29326141224733965,
     "old_correlation": -0.6360420214271593,
     "old_sharpe": 0.035642368438952576,
-    "old_appearances": 40
+    "old_appearances": 40,
+    "logo": "https://coin-images.coingecko.com/coins/images/27045/small/wbt_token.png?1696526096"
   },
   "BCH": {
     "name": "Bitcoin Cash",
@@ -109,7 +115,8 @@
     "avg_daily_return": 0.08762088396704096,
     "old_correlation": 0.09443032123631172,
     "old_sharpe": 0.14921138678874898,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/15774/small/bitcoin-cash-circle.png?1696515398"
   },
   "LINK": {
     "name": "Chainlink",
@@ -125,7 +132,8 @@
     "avg_daily_return": -0.010074718937795466,
     "old_correlation": 0.2606900572439467,
     "old_sharpe": 0.13228959928940887,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/877/small/Chainlink_Logo_500.png?1760023405"
   },
   "LEO": {
     "name": "LEO Token",
@@ -141,7 +149,8 @@
     "avg_daily_return": 0.01670651733560813,
     "old_correlation": -0.8802929115556185,
     "old_sharpe": -0.22608358888667401,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/51150/small/leo.webp?1730238039"
   },
   "XLM": {
     "name": "Stellar",
@@ -157,7 +166,8 @@
     "avg_daily_return": -0.047283738712983366,
     "old_correlation": 0.24277501413922647,
     "old_sharpe": 0.1014549574380042,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/100/small/fmpFRHHQ_400x400.jpg?1735231350"
   },
   "XMR": {
     "name": "Monero",
@@ -173,7 +183,8 @@
     "avg_daily_return": 0.2622959018176474,
     "old_correlation": -0.8420444043896327,
     "old_sharpe": -0.2386483032420126,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/69/small/monero_logo.png?1696501460"
   },
   "ZEC": {
     "name": "Zcash",
@@ -189,7 +200,8 @@
     "avg_daily_return": 0.7734724119691062,
     "old_correlation": -0.21429027203018494,
     "old_sharpe": 0.13326987337781934,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/70075/small/zcash.png?1760512015"
   },
   "LTC": {
     "name": "Litecoin",
@@ -205,7 +217,8 @@
     "avg_daily_return": 0.012643805133604025,
     "old_correlation": -0.0633245061297765,
     "old_sharpe": -0.3402353734844857,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/15456/small/LrysCc5Q_400x400.jpg?1696515103"
   },
   "SUI": {
     "name": "Sui",
@@ -221,7 +234,8 @@
     "avg_daily_return": -0.0850762328582873,
     "old_correlation": 0.36066916500114166,
     "old_sharpe": 0.11202555035198136,
-    "old_appearances": 36
+    "old_appearances": 36,
+    "logo": "https://coin-images.coingecko.com/coins/images/26375/small/sui-ocean-square.png?1727791290"
   },
   "AVAX": {
     "name": "Avalanche",
@@ -237,7 +251,8 @@
     "avg_daily_return": -0.20393937083902097,
     "old_correlation": 0.4714251118774276,
     "old_sharpe": 0.11726862375319963,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/12559/small/Avalanche_Circle_RedWhite_Trans.png?1696512369"
   },
   "HBAR": {
     "name": "Hedera",
@@ -253,7 +268,8 @@
     "avg_daily_return": -0.0809455667804995,
     "old_correlation": 0.3143844039981541,
     "old_sharpe": 0.09008975849566164,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/3688/small/hbar.png?1696504364"
   },
   "SHIB": {
     "name": "Shiba Inu",
@@ -269,7 +285,8 @@
     "avg_daily_return": -0.2378547343939604,
     "old_correlation": 0.19871373188239988,
     "old_sharpe": 0.04392368646107636,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/50193/small/shib.png?1726214772"
   },
   "TON": {
     "name": "Toncoin",
@@ -285,7 +302,8 @@
     "avg_daily_return": -0.27390326759002354,
     "old_correlation": -0.3358961466876319,
     "old_sharpe": -0.14812073103375772,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/67547/small/ton.jpeg?1753153388"
   },
   "CRO": {
     "name": "Cronos",
@@ -301,7 +319,8 @@
     "avg_daily_return": -0.015608898251940789,
     "old_correlation": 0.2903847933321823,
     "old_sharpe": 0.17696552630884588,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/39774/small/cro_token.jpeg?1724057134"
   },
   "MNT": {
     "name": "Mantle",
@@ -317,7 +336,8 @@
     "avg_daily_return": 0.13838649920116677,
     "old_correlation": 0.1981176775112871,
     "old_sharpe": -0.02306997384858053,
-    "old_appearances": 34
+    "old_appearances": 34,
+    "logo": "https://coin-images.coingecko.com/coins/images/30980/small/Mantle-Logo-mark.png?1739213200"
   },
   "UNI": {
     "name": "Uniswap",
@@ -333,7 +353,8 @@
     "avg_daily_return": -0.13301575517443187,
     "old_correlation": 0.24870222862682756,
     "old_sharpe": -0.09579188084375459,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/50195/small/uni.png?1726227605"
   },
   "DOT": {
     "name": "Polkadot",
@@ -349,7 +370,8 @@
     "avg_daily_return": -0.27957926820977114,
     "old_correlation": 0.1693599784134375,
     "old_sharpe": -0.24897611934051292,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/15457/small/-Tj2WF_6_400x400.jpg?1696515104"
   },
   "AAVE": {
     "name": "Aave",
@@ -365,7 +387,8 @@
     "avg_daily_return": 0.056544505585637485,
     "old_correlation": 0.23310435450521788,
     "old_sharpe": 0.03502684390833015,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/12645/small/aave-token-round.png?1720472354"
   },
   "TAO": {
     "name": "Bittensor",
@@ -381,7 +404,8 @@
     "avg_daily_return": -0.043915943247479036,
     "old_correlation": 0.27439762168671167,
     "old_sharpe": 0.1680622686698083,
-    "old_appearances": 38
+    "old_appearances": 38,
+    "logo": "https://coin-images.coingecko.com/coins/images/28452/small/ARUsPeNQ_400x400.jpeg?1696527447"
   },
   "BGB": {
     "name": "Bitget Token",
@@ -397,7 +421,8 @@
     "avg_daily_return": 0.18145353908625297,
     "old_correlation": -0.49909964103644316,
     "old_sharpe": -0.2129410541896393,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/11610/small/Bitget_logo.png?1736925727"
   },
   "OKB": {
     "name": "OKB",
@@ -413,7 +438,8 @@
     "avg_daily_return": 0.40989551945824876,
     "old_correlation": -0.12210821373928797,
     "old_sharpe": 0.03758858978866525,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/4463/small/WeChat_Image_20220118095654.png?1696505053"
   },
   "NEAR": {
     "name": "NEAR Protocol",
@@ -429,7 +455,8 @@
     "avg_daily_return": -0.22687843548671877,
     "old_correlation": 0.605380221497719,
     "old_sharpe": 0.0914177238660145,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/51252/small/NEAR.JPG?1730470269"
   },
   "XAUT": {
     "name": "Tether Gold",
@@ -445,7 +472,8 @@
     "avg_daily_return": 0.12922679969872536,
     "old_correlation": -0.9905485850555016,
     "old_sharpe": -0.2551960043328238,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/10481/small/Tether_Gold.png?1696510471"
   },
   "ETC": {
     "name": "Ethereum Classic",
@@ -461,7 +489,8 @@
     "avg_daily_return": -0.14479611975262935,
     "old_correlation": 0.10828380592109789,
     "old_sharpe": -0.18111767171167176,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/453/small/ethereum-classic-logo.png?1696501717"
   },
   "PEPE": {
     "name": "Pepe",
@@ -477,7 +506,8 @@
     "avg_daily_return": -0.29711318773215833,
     "old_correlation": 0.49364030738180104,
     "old_sharpe": 0.22202341202939363,
-    "old_appearances": 36
+    "old_appearances": 36,
+    "logo": "https://coin-images.coingecko.com/coins/images/67355/small/mnm33n5g23brzlywg6p313ybzi6w.?1752490975"
   },
   "ICP": {
     "name": "Internet Computer",
@@ -493,7 +523,8 @@
     "avg_daily_return": -0.19734387438360654,
     "old_correlation": 0.03293081321428555,
     "old_sharpe": 0.02374975392178057,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/14495/small/Internet_Computer_logo.png?1696514180"
   },
   "JLP": {
     "name": "Jupiter Perpetuals Liquidity Provider Token",
@@ -509,7 +540,8 @@
     "avg_daily_return": 0.0530485594625976,
     "old_correlation": -0.8246902341909365,
     "old_sharpe": -0.04899416459849586,
-    "old_appearances": 33
+    "old_appearances": 33,
+    "logo": "https://coin-images.coingecko.com/coins/images/33094/small/jlp.png?1700631386"
   },
   "ONDO": {
     "name": "Ondo",
@@ -525,7 +557,8 @@
     "avg_daily_return": -0.1897445795531881,
     "old_correlation": 0.26712085378265843,
     "old_sharpe": 0.18654347054364465,
-    "old_appearances": 31
+    "old_appearances": 31,
+    "logo": "https://coin-images.coingecko.com/coins/images/26580/small/ONDO.png?1696525656"
   },
   "KAS": {
     "name": "Kaspa",
@@ -541,7 +574,8 @@
     "avg_daily_return": -0.1816136682243585,
     "old_correlation": 0.05521724476197945,
     "old_sharpe": 0.08852423291256613,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/25751/small/kaspa-icon-exchanges.png?1696524837"
   },
   "PAXG": {
     "name": "PAX Gold",
@@ -557,7 +591,8 @@
     "avg_daily_return": 0.1309301265314245,
     "old_correlation": -0.990934311854817,
     "old_sharpe": -0.2521535283086602,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/70025/small/IMG_7998.webp?1760438148"
   },
   "WLD": {
     "name": "Worldcoin",
@@ -573,7 +608,8 @@
     "avg_daily_return": -0.21603961199012334,
     "old_correlation": 0.2893774917142725,
     "old_sharpe": 0.04602043802576665,
-    "old_appearances": 34
+    "old_appearances": 34,
+    "logo": "https://coin-images.coingecko.com/coins/images/31069/small/worldcoin.jpeg?1696529903"
   },
   "KCS": {
     "name": "KuCoin",
@@ -589,7 +625,8 @@
     "avg_daily_return": -0.029033689397461326,
     "old_correlation": -0.5780205369405934,
     "old_sharpe": -0.34121917122314055,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/1047/small/sa9z79.png?1696502152"
   },
   "QNT": {
     "name": "Quant",
@@ -605,7 +642,8 @@
     "avg_daily_return": -0.02703278843281291,
     "old_correlation": -0.2137037157580086,
     "old_sharpe": -0.24640023206963044,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/3370/small/5ZOu7brX_400x400.jpg?1696504070"
   },
   "POL": {
     "name": "POL (ex-MATIC)",
@@ -621,7 +659,8 @@
     "avg_daily_return": -0.3318364054477362,
     "old_correlation": 0.1999273054131026,
     "old_sharpe": -0.30683208512866395,
-    "old_appearances": 33
+    "old_appearances": 33,
+    "logo": "https://coin-images.coingecko.com/coins/images/67279/small/polygon.jpg?1752293315"
   },
   "APT": {
     "name": "Aptos",
@@ -637,7 +676,8 @@
     "avg_daily_return": -0.4104338696407106,
     "old_correlation": 0.29113244205911365,
     "old_sharpe": 0.11035409709357911,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/26455/small/Aptos-Network-Symbol-Black-RGB-1x.png?1761789140"
   },
   "GT": {
     "name": "Gate",
@@ -653,7 +693,8 @@
     "avg_daily_return": -0.0057759088669286805,
     "old_correlation": -0.49037969031402884,
     "old_sharpe": -0.1715667859764672,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/8183/small/200X200.png?1735246724"
   },
   "ARB": {
     "name": "Arbitrum",
@@ -669,7 +710,8 @@
     "avg_daily_return": -0.2521864130160335,
     "old_correlation": 0.426703990223604,
     "old_sharpe": -0.26003670890435165,
-    "old_appearances": 37
+    "old_appearances": 37,
+    "logo": "https://coin-images.coingecko.com/coins/images/68840/small/photo_2025-08-31_14-08-21.jpg?1756755786"
   },
   "ALGO": {
     "name": "Algorand",
@@ -685,7 +727,8 @@
     "avg_daily_return": -0.1872369398163954,
     "old_correlation": 0.48030517475634765,
     "old_sharpe": 0.041262067500089976,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/4380/small/download.png?1696504978"
   },
   "FIL": {
     "name": "Filecoin",
@@ -701,7 +744,8 @@
     "avg_daily_return": -0.22022671589463036,
     "old_correlation": 0.23473165215800734,
     "old_sharpe": -0.032514917418389445,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/15776/small/filecoin.png?1696515400"
   },
   "VET": {
     "name": "VeChain",
@@ -717,7 +761,8 @@
     "avg_daily_return": -0.30242248554500223,
     "old_correlation": 0.17428154615386895,
     "old_sharpe": -0.0931234927153426,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/1167/small/VET.png?1742383283"
   },
   "ATOM": {
     "name": "Cosmos Hub",
@@ -733,7 +778,8 @@
     "avg_daily_return": -0.2659939423059691,
     "old_correlation": 0.00667425945020628,
     "old_sharpe": -0.26585841631536117,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/1481/small/cosmos_hub.png?1696502525"
   },
   "FLR": {
     "name": "Flare",
@@ -749,7 +795,8 @@
     "avg_daily_return": -0.11890881807997271,
     "old_correlation": -0.025925409928676243,
     "old_sharpe": -0.12837223473932846,
-    "old_appearances": 40
+    "old_appearances": 40,
+    "logo": "https://coin-images.coingecko.com/coins/images/28624/small/FLR-icon200x200.png?1696527609"
   },
   "XDC": {
     "name": "XDC Network",
@@ -765,7 +812,8 @@
     "avg_daily_return": -0.054342173315875826,
     "old_correlation": -0.34705588102547796,
     "old_sharpe": -0.11246780269345251,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/2912/small/xdc-icon.png?1696503661"
   },
   "CAKE": {
     "name": "PancakeSwap",
@@ -781,7 +829,8 @@
     "avg_daily_return": 0.07564021186922962,
     "old_correlation": 0.23950914612104973,
     "old_sharpe": -0.004743363184068226,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/12632/small/pancakeswap-cake-logo_%281%29.png?1696512440"
   },
   "RENDER": {
     "name": "Render",
@@ -797,7 +846,8 @@
     "avg_daily_return": -0.3127090853791539,
     "old_correlation": 0.4162844252342386,
     "old_sharpe": 0.125279089994245,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/11636/small/rndr.png?1696511529"
   },
   "SEI": {
     "name": "Sei",
@@ -813,7 +863,8 @@
     "avg_daily_return": -0.25184818319546226,
     "old_correlation": 0.4778575485741362,
     "old_sharpe": -0.040828931502583383,
-    "old_appearances": 34
+    "old_appearances": 34,
+    "logo": "https://coin-images.coingecko.com/coins/images/54862/small/sei.jpg?1742182276"
   },
   "BONK": {
     "name": "Bonk",
@@ -829,7 +880,8 @@
     "avg_daily_return": -0.1588518018938258,
     "old_correlation": 0.4520947784989059,
     "old_sharpe": 0.25549372798527303,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/67910/small/200x200bbonk.jpg?1755095469"
   },
   "JUP": {
     "name": "Jupiter",
@@ -845,7 +897,8 @@
     "avg_daily_return": -0.2718954750379196,
     "old_correlation": 0.44410416084954885,
     "old_sharpe": 0.06558983896507113,
-    "old_appearances": 30
+    "old_appearances": 30,
+    "logo": "https://coin-images.coingecko.com/coins/images/10351/small/logo512.png?1696510352"
   },
   "SPX": {
     "name": "SPX6900",
@@ -861,7 +914,8 @@
     "avg_daily_return": 0.4299743395510359,
     "old_correlation": 0.19631948701961618,
     "old_sharpe": 0.22003629942319863,
-    "old_appearances": 34
+    "old_appearances": 34,
+    "logo": "https://coin-images.coingecko.com/coins/images/31401/small/centeredcoin_%281%29.png?1737048493"
   },
   "FET": {
     "name": "Artificial Superintelligence Alliance",
@@ -877,7 +931,8 @@
     "avg_daily_return": -0.3491505640181691,
     "old_correlation": 0.528264788014617,
     "old_sharpe": 0.1614428752557448,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/5681/small/ASI.png?1719827289"
   },
   "AERO": {
     "name": "Aerodrome Finance",
@@ -893,7 +948,8 @@
     "avg_daily_return": -0.08077816663611331,
     "old_correlation": 0.47301729413146804,
     "old_sharpe": 0.24954551347542248,
-    "old_appearances": 34
+    "old_appearances": 34,
+    "logo": "https://coin-images.coingecko.com/coins/images/31745/small/token.png?1696530564"
   },
   "OP": {
     "name": "Optimism",
@@ -909,7 +965,8 @@
     "avg_daily_return": -0.37311661557405323,
     "old_correlation": 0.3332763189989775,
     "old_sharpe": -0.02191186856262927,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/70891/small/rscyir5hkt8lepch273cie8e3bwm.?1764395673"
   },
   "DASH": {
     "name": "Dash",
@@ -925,7 +982,8 @@
     "avg_daily_return": 0.20558378831616955,
     "old_correlation": -0.2485785719919924,
     "old_sharpe": 0.04823758716340116,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/19/small/dash-logo.png?1696501423"
   },
   "BDX": {
     "name": "Beldex",
@@ -941,7 +999,8 @@
     "avg_daily_return": 0.0488221649469035,
     "old_correlation": -0.7683994301454272,
     "old_sharpe": -0.24202836864137425,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/50683/small/BDXcg.PNG?1728774730"
   },
   "INJ": {
     "name": "Injective",
@@ -957,7 +1016,8 @@
     "avg_daily_return": -0.27843772643583575,
     "old_correlation": 0.629714087221797,
     "old_sharpe": 0.1175795323231272,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/12882/small/Other_200x200.png?1738782212"
   },
   "VIRTUAL": {
     "name": "Virtuals Protocol",
@@ -973,7 +1033,8 @@
     "avg_daily_return": 0.22966808867209756,
     "old_correlation": 0.41807757363572867,
     "old_sharpe": 0.24438533588327616,
-    "old_appearances": 32
+    "old_appearances": 32,
+    "logo": "https://coin-images.coingecko.com/coins/images/34057/small/LOGOMARK.png?1708356054"
   },
   "CRV": {
     "name": "Curve DAO",
@@ -989,7 +1050,8 @@
     "avg_daily_return": -0.09140097461312174,
     "old_correlation": 0.47259229307526784,
     "old_sharpe": 0.0018511133451504717,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/31182/small/CurveFi_32.png?1696530010"
   },
   "STX": {
     "name": "Stacks",
@@ -1005,7 +1067,8 @@
     "avg_daily_return": -0.42140906403128897,
     "old_correlation": 0.39051616002999556,
     "old_sharpe": 0.07899234224708945,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/2069/small/Stacks_Logo_png.png?1709979332"
   },
   "STRK": {
     "name": "Starknet",
@@ -1021,7 +1084,8 @@
     "avg_daily_return": -0.2627634838046475,
     "old_correlation": 0.11006872217979097,
     "old_sharpe": -0.34979634300293316,
-    "old_appearances": 30
+    "old_appearances": 30,
+    "logo": "https://coin-images.coingecko.com/coins/images/26433/small/starknet.png?1696525507"
   },
   "ULTIMA": {
     "name": "Ultima",
@@ -1037,7 +1101,8 @@
     "avg_daily_return": 0.2931341950959141,
     "old_correlation": -0.540693235445992,
     "old_sharpe": -0.1229662109621948,
-    "old_appearances": 34
+    "old_appearances": 34,
+    "logo": "https://coin-images.coingecko.com/coins/images/31844/small/ULTIMA-200x200.png?1763090865"
   },
   "LDO": {
     "name": "Lido DAO",
@@ -1053,7 +1118,8 @@
     "avg_daily_return": -0.11010486313135669,
     "old_correlation": 0.3947850414701049,
     "old_sharpe": -0.06319590611322268,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/13573/small/Lido_DAO.png?1696513326"
   },
   "XTZ": {
     "name": "Tezos",
@@ -1069,7 +1135,8 @@
     "avg_daily_return": -0.19175044335870045,
     "old_correlation": 0.20396581942257966,
     "old_sharpe": -0.17889712107661596,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/51251/small/TEZOS.png?1730470163"
   },
   "TEL": {
     "name": "Telcoin",
@@ -1085,7 +1152,8 @@
     "avg_daily_return": 0.22648559420760087,
     "old_correlation": 0.40186075330058935,
     "old_sharpe": 0.16665618561248946,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/1899/small/tel.png?1696502892"
   },
   "TIA": {
     "name": "Celestia",
@@ -1101,7 +1169,8 @@
     "avg_daily_return": -0.4786872520179785,
     "old_correlation": -0.13128593907238187,
     "old_sharpe": -0.23437393361619802,
-    "old_appearances": 33
+    "old_appearances": 33,
+    "logo": "https://coin-images.coingecko.com/coins/images/31967/small/tia.jpg?1696530772"
   },
   "GRT": {
     "name": "The Graph",
@@ -1117,7 +1186,8 @@
     "avg_daily_return": -0.36400688658190283,
     "old_correlation": 0.5635273193518665,
     "old_sharpe": -0.037458824839669044,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/13397/small/Graph_Token.png?1696513159"
   },
   "AB": {
     "name": "AB",
@@ -1133,7 +1203,8 @@
     "avg_daily_return": 2.0137989638110465,
     "old_correlation": 0.13045353353217964,
     "old_sharpe": 0.19953443359161424,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/4376/small/400%E6%96%B9.png?1740377493"
   },
   "FLOKI": {
     "name": "FLOKI",
@@ -1149,7 +1220,8 @@
     "avg_daily_return": -0.24897572401383272,
     "old_correlation": 0.46259659431450406,
     "old_sharpe": 0.22334490464029325,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/16746/small/PNG_image.png?1696516318"
   },
   "ENS": {
     "name": "Ethereum Name Service",
@@ -1165,7 +1237,8 @@
     "avg_daily_return": -0.1876926774885465,
     "old_correlation": 0.05783908626071527,
     "old_sharpe": -0.031479065964480746,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/19785/small/ENS.jpg?1727872989"
   },
   "IOTA": {
     "name": "IOTA",
@@ -1181,7 +1254,8 @@
     "avg_daily_return": -0.2436302069233685,
     "old_correlation": 0.32549411303405085,
     "old_sharpe": -0.03966536340879026,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/692/small/IOTA_Thumbnail_%281%29.png?1743772896"
   },
   "SUN": {
     "name": "Sun Token",
@@ -1197,7 +1271,8 @@
     "avg_daily_return": 0.02304251506917233,
     "old_correlation": -0.09380274747990415,
     "old_sharpe": 0.07112712026636589,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/12424/small/RSFOmQ.png?1696512245"
   },
   "BTT": {
     "name": "BitTorrent",
@@ -1213,7 +1288,8 @@
     "avg_daily_return": -0.2744256786781778,
     "old_correlation": -0.07158255046798337,
     "old_sharpe": -0.08582994247070733,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/22457/small/btt_logo.png?1696521780"
   },
   "BSV": {
     "name": "Bitcoin SV",
@@ -1229,6 +1305,7 @@
     "avg_daily_return": -0.2243293536110053,
     "old_correlation": -0.0716027135915689,
     "old_sharpe": -0.2038890828710342,
-    "old_appearances": 41
+    "old_appearances": 41,
+    "logo": "https://coin-images.coingecko.com/coins/images/6799/small/BSV.png?1696507128"
   }
 }

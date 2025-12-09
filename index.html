@@ -150,8 +150,18 @@
         }
 
         .coin-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             font-weight: 600;
             color: #fff;
+        }
+
+        .coin-logo {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
         }
 
         .badge {
@@ -514,10 +524,16 @@
             }
 
             filteredData.forEach((coin, index) => {
+                const logoHtml = coin.logo ? `<img src="${coin.logo}" alt="${coin.symbol}" class="coin-logo">` : '';
                 const row = `
                     <tr>
                         <td>${index + 1}</td>
-                        <td><span class="coin-name">${coin.symbol}</span></td>
+                        <td>
+                            <div class="coin-name">
+                                ${logoHtml}
+                                <span>${coin.symbol}</span>
+                            </div>
+                        </td>
                         <td class="number">${formatSharpe(coin.sharpe_ratio)}</td>
                         <td class="number">${formatPercent(coin.annual_return)}</td>
                         <td class="number">${coin.annual_volatility.toFixed(1)}%</td>
