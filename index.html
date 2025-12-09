@@ -313,7 +313,10 @@
         </div>
 
         <div class="tabs">
-            <div class="tab active" data-sort="sharpe">По Sharpe Ratio</div>
+            <div class="tab active" data-sort="sharpe">По Sharpe</div>
+            <div class="tab" data-sort="sortino">По Sortino</div>
+            <div class="tab" data-sort="calmar">По Calmar</div>
+            <div class="tab" data-sort="winrate">По Win Rate</div>
             <div class="tab" data-sort="correlation">По корреляции</div>
             <div class="tab" data-sort="volatility">По волатильности</div>
             <div class="tab" data-sort="beta">По Beta</div>
@@ -331,6 +334,10 @@
                         <th>#</th>
                         <th>Монета</th>
                         <th class="number">Sharpe</th>
+                        <th class="number">Sortino</th>
+                        <th class="number">Calmar</th>
+                        <th class="number">Win%</th>
+                        <th class="number">Up/Down</th>
                         <th class="number">Доходность</th>
                         <th class="number">Волатильность</th>
                         <th class="number">Корреляция</th>
@@ -495,10 +502,21 @@
             return `${icon} <span class="badge ${badge}">${num >= 0 ? '+' : ''}${num.toFixed(3)}</span>`;
         }
 
+        function formatUpDown(upside, downside) {
+            const up = parseFloat(upside);
+            const down = Math.abs(parseFloat(downside));
+            const score = up - down;
+            const colorClass = score > 0 ? 'positive' : 'negative';
+            return `<span class="${colorClass}">${up.toFixed(0)}/${down.toFixed(0)}</span>`;
+        }
+
         // Сортировка данных
         function sortData(sortBy) {
             const sortFunctions = {
                 sharpe: (a, b) => b.sharpe_ratio - a.sharpe_ratio,
+                sortino: (a, b) => b.sortino_ratio - a.sortino_ratio,
+                calmar: (a, b) => b.calmar_ratio - a.calmar_ratio,
+                winrate: (a, b) => b.win_rate - a.win_rate,
                 correlation: (a, b) => Math.abs(a.correlation) - Math.abs(b.correlation),
                 volatility: (a, b) => a.annual_volatility - b.annual_volatility,
                 beta: (a, b) => Math.abs(b.beta) - Math.abs(a.beta),
@@ -535,6 +553,10 @@
                             </div>
                         </td>
                         <td class="number">${formatSharpe(coin.sharpe_ratio)}</td>
+                        <td class="number">${formatSharpe(coin.sortino_ratio)}</td>
+                        <td class="number">${coin.calmar_ratio.toFixed(2)}</td>
+                        <td class="number">${coin.win_rate.toFixed(1)}%</td>
+                        <td class="number">${formatUpDown(coin.upside_capture, coin.downside_capture)}</td>
                         <td class="number">${formatPercent(coin.annual_return)}</td>
                         <td class="number">${coin.annual_volatility.toFixed(1)}%</td>
                         <td class="number">${formatCorrelation(coin.correlation)}</td>
