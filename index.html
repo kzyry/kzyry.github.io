@@ -326,8 +326,10 @@
             <div class="tab" data-sort="sortino">Sortino</div>
             <div class="tab" data-sort="calmar">Calmar</div>
             <div class="tab" data-sort="winrate">Win Rate</div>
-            <div class="tab" data-sort="correlation">Корреляция</div>
+            <div class="tab" data-sort="updown">Up/Down</div>
+            <div class="tab" data-sort="return">Доходность</div>
             <div class="tab" data-sort="volatility">Волатильность</div>
+            <div class="tab" data-sort="correlation">Корреляция</div>
             <div class="tab" data-sort="beta">Beta</div>
             <div class="tab" data-sort="maxdd">Max DD</div>
         </div>
@@ -496,6 +498,44 @@
                     <p><strong>Психологический фактор:</strong> Win Rate — это показатель "эмоционального комфорта". Если вы паникуете при виде красных дней, выбирайте монеты с Win Rate > 52%. Это поможет вам не продать на панике.</p>
                     <p><strong>Применение:</strong> Используйте вместе с Sharpe или Sortino. Идеал: высокий Win Rate (>53%) + высокий Sharpe (>1.0) = монета растёт часто и приносит хорошую прибыль.</p>
                 `
+            },
+            updown: {
+                title: 'Upside/Downside Capture - Асимметрия относительно Bitcoin',
+                content: `
+                    <p><strong>Что это:</strong> Показывает, как монета ведёт себя относительно Bitcoin в растущие и падающие дни. Отображается как два числа: Upside/Downside (например, 187/91).</p>
+                    <p><strong>Как это работает:</strong></p>
+                    <ul>
+                        <li><strong>Upside Capture (первое число):</strong> В дни, когда BTC растёт, сколько % от роста BTC захватывает монета. 100% = растёт так же, как BTC. 200% = растёт в 2 раза сильнее BTC.</li>
+                        <li><strong>Downside Capture (второе число):</strong> В дни, когда BTC падает, сколько % от падения BTC захватывает монета. 100% = падает так же, как BTC. 50% = падает в 2 раза слабее BTC.</li>
+                    </ul>
+                    <p><strong>Примеры:</strong></p>
+                    <ul>
+                        <li><span style="color: #10b981;">187/91</span> — ИДЕАЛ! Когда BTC растёт на 10%, монета растёт на 18.7%. Когда BTC падает на 10%, монета падает только на 9.1%. Асимметрия в вашу пользу!</li>
+                        <li><span style="color: #3b82f6;">120/80</span> — Хорошо! Растёт сильнее, падает слабее BTC</li>
+                        <li><span style="color: #f59e0b;">150/150</span> — Нейтрально. Усиливает движения BTC в обе стороны поровну</li>
+                        <li><span style="color: #ef4444;">80/120</span> — Плохо! Растёт слабее, падает сильнее BTC. Худший сценарий</li>
+                    </ul>
+                    <p><strong>Применение:</strong> Ищите монеты с высоким Upside и низким Downside. Разница (Upside - Downside) показывает качество асимметрии. Чем больше разница, тем лучше. Идеал: >50 пунктов.</p>
+                    <p><strong>Сортировка:</strong> Таблица отсортирована по разности (Upside - Downside) от наибольшей к наименьшей.</p>
+                `
+            },
+            return: {
+                title: 'Годовая доходность - Сколько заработала монета за год',
+                content: `
+                    <p><strong>Что это:</strong> Показывает, на сколько процентов выросла или упала цена монеты за последние 365 дней. Это ваша прибыль (или убыток), если бы вы купили ровно год назад.</p>
+                    <p><strong>Формула:</strong> ((Цена сегодня - Цена год назад) / Цена год назад) × 100%</p>
+                    <p><strong>Пример:</strong> Монета стоила $100 год назад, сейчас $180 → Годовая доходность = +80%</p>
+                    <p><strong>Как читать:</strong></p>
+                    <ul>
+                        <li><span style="color: #10b981;">Доходность > +50%</span> — отличный результат, монета сильно выросла</li>
+                        <li><span style="color: #3b82f6;">Доходность +10% до +50%</span> — хороший рост, обгоняет традиционные инвестиции</li>
+                        <li><span style="color: #f59e0b;">Доходность -10% до +10%</span> — нейтральный результат, цена почти не изменилась</li>
+                        <li><span style="color: #ef4444;">Доходность < -10%</span> — убыток, монета упала в цене</li>
+                    </ul>
+                    <p><strong>ВАЖНО:</strong> Высокая доходность НЕ означает хорошую инвестицию! Монета могла вырасти на +200%, но с волатильностью 300% (очень рискованно). Всегда смотрите на Sharpe Ratio вместе с доходностью.</p>
+                    <p><strong>Применение:</strong> Используйте доходность вместе с другими метриками. Лучшие монеты: высокая доходность + высокий Sharpe + низкий Max DD. Не гонитесь только за доходностью!</p>
+                    <p><strong>Сортировка:</strong> Таблица отсортирована от наибольшей доходности к наименьшей.</p>
+                `
             }
         };
 
@@ -590,8 +630,10 @@
                 sortino: (a, b) => b.sortino_ratio - a.sortino_ratio,
                 calmar: (a, b) => b.calmar_ratio - a.calmar_ratio,
                 winrate: (a, b) => b.win_rate - a.win_rate,
-                correlation: (a, b) => Math.abs(a.correlation) - Math.abs(b.correlation),
+                updown: (a, b) => (b.upside_capture - Math.abs(b.downside_capture)) - (a.upside_capture - Math.abs(a.downside_capture)),
+                return: (a, b) => b.annual_return - a.annual_return,
                 volatility: (a, b) => a.annual_volatility - b.annual_volatility,
+                correlation: (a, b) => Math.abs(a.correlation) - Math.abs(b.correlation),
                 beta: (a, b) => Math.abs(b.beta) - Math.abs(a.beta),
                 maxdd: (a, b) => b.max_drawdown - a.max_drawdown  // От меньшей просадки к большей
             };
