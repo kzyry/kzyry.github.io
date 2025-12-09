@@ -304,7 +304,6 @@
 
         <div class="tabs">
             <div class="tab active" data-sort="sharpe">По Sharpe Ratio</div>
-            <div class="tab" data-sort="return">По доходности</div>
             <div class="tab" data-sort="correlation">По корреляции</div>
             <div class="tab" data-sort="volatility">По волатильности</div>
             <div class="tab" data-sort="beta">По Beta</div>
@@ -358,21 +357,6 @@
                         <li><span style="color: #ef4444;">Sharpe < 0</span> — монета в убытке</li>
                     </ul>
                     <p><strong>Применение:</strong> Используйте для поиска монет с лучшим соотношением прибыль/риск. Идеально для долгосрочных инвестиций.</p>
-                `
-            },
-            return: {
-                title: 'Годовая доходность - Сколько заработала монета',
-                content: `
-                    <p><strong>Что это:</strong> Показывает, на сколько процентов выросла (или упала) цена монеты за последний год. Это ваша потенциальная прибыль или убыток.</p>
-                    <p><strong>Расчет:</strong> Основан на 365 днях реальных дневных данных, приведенных к годовому значению.</p>
-                    <p><strong>Как читать:</strong></p>
-                    <ul>
-                        <li><span style="color: #10b981;">+500% и выше</span> — супер-рост, но часто с высоким риском</li>
-                        <li><span style="color: #10b981;">+100% до +500%</span> — сильный рост</li>
-                        <li><span style="color: #10b981;">+20% до +100%</span> — умеренный рост</li>
-                        <li><span style="color: #ef4444;">Отрицательные значения</span> — монета упала в цене, убыток</li>
-                    </ul>
-                    <p><strong>Применение:</strong> Для поиска монет с максимальной прибылью. Но помните: высокая доходность обычно = высокий риск! Смотрите также на Sharpe Ratio.</p>
                 `
             },
             correlation: {
@@ -487,7 +471,6 @@
         function sortData(sortBy) {
             const sortFunctions = {
                 sharpe: (a, b) => b.sharpe_ratio - a.sharpe_ratio,
-                return: (a, b) => b.annual_return - a.annual_return,
                 correlation: (a, b) => Math.abs(a.correlation) - Math.abs(b.correlation),
                 volatility: (a, b) => a.annual_volatility - b.annual_volatility,
                 beta: (a, b) => Math.abs(b.beta) - Math.abs(a.beta)
