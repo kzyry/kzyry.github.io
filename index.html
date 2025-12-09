@@ -137,6 +137,15 @@
             background: #222;
         }
 
+        .highlight-column {
+            background: #2a2a2a;
+        }
+
+        th.highlight-column {
+            background: #3a3a3a;
+            color: #fff;
+        }
+
         .positive {
             color: #10b981;
         }
@@ -333,16 +342,16 @@
                     <tr>
                         <th>#</th>
                         <th>Монета</th>
-                        <th class="number">Sharpe</th>
-                        <th class="number">Sortino</th>
-                        <th class="number">Calmar</th>
-                        <th class="number">Win%</th>
-                        <th class="number">Up/Down</th>
-                        <th class="number">Доходность</th>
-                        <th class="number">Волатильность</th>
-                        <th class="number">Корреляция</th>
-                        <th class="number">Beta</th>
-                        <th class="number">Max DD</th>
+                        <th class="number" data-col="sharpe">Sharpe</th>
+                        <th class="number" data-col="sortino">Sortino</th>
+                        <th class="number" data-col="calmar">Calmar</th>
+                        <th class="number" data-col="winrate">Win%</th>
+                        <th class="number" data-col="updown">Up/Down</th>
+                        <th class="number" data-col="return">Доходность</th>
+                        <th class="number" data-col="volatility">Волатильность</th>
+                        <th class="number" data-col="correlation">Корреляция</th>
+                        <th class="number" data-col="beta">Beta</th>
+                        <th class="number" data-col="maxdd">Max DD</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -561,6 +570,19 @@
             return `<span class="${colorClass}">${up.toFixed(0)}/${down.toFixed(0)}</span>`;
         }
 
+        // Подсветка активной колонки
+        function highlightColumn(sortBy) {
+            // Убираем подсветку со всех колонок
+            document.querySelectorAll('th[data-col], td[data-col]').forEach(cell => {
+                cell.classList.remove('highlight-column');
+            });
+
+            // Добавляем подсветку к активной колонке
+            document.querySelectorAll(`th[data-col="${sortBy}"], td[data-col="${sortBy}"]`).forEach(cell => {
+                cell.classList.add('highlight-column');
+            });
+        }
+
         // Сортировка данных
         function sortData(sortBy) {
             const sortFunctions = {
@@ -577,6 +599,7 @@
             metricsData.sort(sortFunctions[sortBy]);
             currentSort = sortBy;
             renderTable();
+            highlightColumn(sortBy);
         }
 
         // Рендер таблицы
@@ -603,16 +626,16 @@
                                 <span>${coin.symbol}</span>
                             </div>
                         </td>
-                        <td class="number">${formatSharpe(coin.sharpe_ratio)}</td>
-                        <td class="number">${formatSharpe(coin.sortino_ratio)}</td>
-                        <td class="number">${coin.calmar_ratio.toFixed(2)}</td>
-                        <td class="number">${coin.win_rate.toFixed(1)}%</td>
-                        <td class="number">${formatUpDown(coin.upside_capture, coin.downside_capture)}</td>
-                        <td class="number">${formatPercent(coin.annual_return)}</td>
-                        <td class="number">${coin.annual_volatility.toFixed(1)}%</td>
-                        <td class="number">${formatCorrelation(coin.correlation)}</td>
-                        <td class="number">${coin.beta.toFixed(2)}</td>
-                        <td class="number">${formatPercent(coin.max_drawdown)}</td>
+                        <td class="number" data-col="sharpe">${formatSharpe(coin.sharpe_ratio)}</td>
+                        <td class="number" data-col="sortino">${formatSharpe(coin.sortino_ratio)}</td>
+                        <td class="number" data-col="calmar">${coin.calmar_ratio.toFixed(2)}</td>
+                        <td class="number" data-col="winrate">${coin.win_rate.toFixed(1)}%</td>
+                        <td class="number" data-col="updown">${formatUpDown(coin.upside_capture, coin.downside_capture)}</td>
+                        <td class="number" data-col="return">${formatPercent(coin.annual_return)}</td>
+                        <td class="number" data-col="volatility">${coin.annual_volatility.toFixed(1)}%</td>
+                        <td class="number" data-col="correlation">${formatCorrelation(coin.correlation)}</td>
+                        <td class="number" data-col="beta">${coin.beta.toFixed(2)}</td>
+                        <td class="number" data-col="maxdd">${formatPercent(coin.max_drawdown)}</td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
