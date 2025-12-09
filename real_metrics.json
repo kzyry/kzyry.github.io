@@ -831,22 +831,6 @@
     "old_sharpe": 0.25549372798527303,
     "old_appearances": 41
   },
-  "OUSG": {
-    "name": "OUSG",
-    "correlation": -0.0036736987077364987,
-    "annual_return": 2.735684269419663,
-    "annual_volatility": 0.14356021959134918,
-    "sharpe_ratio": 19.05600504935779,
-    "beta": -1.4843283557135742e-05,
-    "alpha": 2.7357009137340182,
-    "max_drawdown": 0,
-    "sync_with_btc": 34.24657534246575,
-    "days_analyzed": 365,
-    "avg_daily_return": 0.010855889958014536,
-    "old_correlation": -0.999937377969958,
-    "old_sharpe": -0.22272165711063627,
-    "old_appearances": 33
-  },
   "JUP": {
     "name": "Jupiter",
     "correlation": 0.6600829751436521,
