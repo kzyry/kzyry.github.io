@@ -16,48 +16,9 @@
             background: #0a0a0a;
             color: #e0e0e0;
             line-height: 1.6;
-            padding-top: 80px;
+            padding: 20px;
         }
 
-        .header-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 80px;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-            border-bottom: 1px solid #333;
-            z-index: 1000;
-        }
-
-        .header-nav nav {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-
-        .header-nav nav a {
-            color: #888;
-            text-decoration: none;
-            font-size: 1em;
-            font-weight: 500;
-            transition: color 0.3s ease;
-            cursor: pointer;
-        }
-
-        .header-nav nav a:hover {
-            color: #667eea;
-        }
-
-        .header-nav nav a.active {
-            color: #fff;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 4px;
-        }
 
         .container {
             max-width: 1400px;
@@ -383,13 +344,6 @@
     </style>
 </head>
 <body>
-    <div class="header-nav">
-        <nav>
-            <a href="#" class="nav-link active" data-page="metrics">Метрики</a>
-            <a href="#" class="nav-link" data-page="screener">Скринер</a>
-        </nav>
-    </div>
-
     <div class="container">
         <!-- Страница: Метрики -->
         <div id="metricsPage" class="page active">
@@ -409,6 +363,7 @@
             <div class="tab" data-sort="beta">Beta</div>
             <div class="tab" data-sort="maxdd">Max DD</div>
             <div class="tab" data-sort="ratings">Рейтинги</div>
+            <div class="tab" data-sort="screener">Скринер</div>
         </div>
 
         <div class="description-box" id="descriptionBox">
@@ -458,6 +413,8 @@
         let currentSort = 'sharpe';
         let ratingsData = []; // Данные с рейтингами
         let currentRatingSort = 'aggressive'; // Текущая сортировка рейтингов
+        let periodMetricsData = null; // Данные скринера
+        let screenerSortColumn = 'period1'; // Текущий период в скринере
 
         // Функция расчета Z-score
         function calculateZScore(value, mean, stdDev) {
@@ -573,6 +530,115 @@
                 });
             });
         }
+
+        // ========== SCREENER FUNCTIONS ==========
+
+        // Загрузка period_metrics.json
+        async function loadPeriodMetrics() {
+            try {
+                const response = await fetch('period_metrics.json');
+                periodMetricsData = await response.json();
+                console.log('✅ Period metrics loaded:', Object.keys(periodMetricsData).length, 'periods');
+            } catch (error) {
+                console.error('❌ Error loading period metrics:', error);
+            }
+        }
+
+        // Форматирование даты
+        function formatDateShort(dateStr) {
+            const months = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+            const [year, month, day] = dateStr.split('-');
+            return `${parseInt(day)} ${months[parseInt(month) - 1]}`;
+        }
+
+        // Рендеринг таблицы Скринера
+        function renderScreenerTable() {
+            if (!periodMetricsData) {
+                tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px;">Загрузка данных скринера...</td></tr>';
+                return;
+            }
+
+            const periodHeaders = [];
+            for (const [key, period] of Object.entries(periodMetricsData)) {
+                const [startDate, endDate] = period.label.split(' - ');
+                periodHeaders.push({
+                    key: key,
+                    line1: formatDateShort(startDate),
+                    line2: formatDateShort(endDate),
+                    days: period.days
+                });
+            }
+
+            tableHead.innerHTML = `
+                <tr>
+                    <th class="sticky-col" style="width: 60px;">№</th>
+                    <th class="sticky-col" style="width: 180px;">Монета</th>
+                    ${periodHeaders.map(p => `
+                        <th class="sortable-period" data-period="${p.key}" style="cursor: pointer; text-align: center; padding: 12px; min-width: 100px;">
+                            <div style="line-height: 1.4;">
+                                <div style="font-weight: 600;">${p.line1}</div>
+                                <div style="font-size: 0.9em; opacity: 0.9;">${p.line2}</div>
+                                <div style="font-size: 0.75em; opacity: 0.6; margin-top: 4px;">${p.days} дней</div>
+                            </div>
+                        </th>
+                    `).join('')}
+                </tr>
+            `;
+
+            const coinsWithScores = metricsData.map(coin => {
+                const scores = {};
+                for (const [key, period] of Object.entries(periodMetricsData)) {
+                    scores[key] = period.scores[coin.symbol] || 0;
+                }
+                return { ...coin, periodScores: scores };
+            });
+
+            coinsWithScores.sort((a, b) => {
+                const aVal = a.periodScores[screenerSortColumn] || 0;
+                const bVal = b.periodScores[screenerSortColumn] || 0;
+                return bVal - aVal;
+            });
+
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = search ? coinsWithScores.filter(c =>
+                c.symbol.toLowerCase().includes(search) ||
+                c.name.toLowerCase().includes(search)
+            ) : coinsWithScores;
+
+            tableBody.innerHTML = filtered.map((coin, index) => {
+                const periodCells = Object.keys(periodMetricsData).map(key => {
+                    const score = coin.periodScores[key] || 0;
+                    return `<td style="text-align: center;">${formatScore(score)}</td>`;
+                }).join('');
+
+                return `
+                    <tr>
+                        <td class="sticky-col" style="text-align: center;">${index + 1}</td>
+                        <td class="sticky-col">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <img src="${coin.logo}" alt="${coin.symbol}" style="width: 24px; height: 24px; border-radius: 50%;">
+                                <strong>${coin.symbol}</strong>
+                                <span style="color: #666; font-size: 0.85em;">#${coin.rank}</span>
+                            </div>
+                        </td>
+                        ${periodCells}
+                    </tr>
+                `;
+            }).join('');
+
+            document.querySelectorAll('.sortable-period').forEach(th => {
+                th.addEventListener('click', () => {
+                    screenerSortColumn = th.dataset.period;
+                    renderScreenerTable();
+                });
+
+                if (th.dataset.period === screenerSortColumn) {
+                    th.style.background = 'rgba(102, 126, 234, 0.3)';
+                }
+            });
+        }
+
+        // ========== END SCREENER FUNCTIONS ==========
 
         // Описания для каждого таба
         const descriptions = {
@@ -756,6 +822,18 @@
 
                     <p><strong>Применение:</strong> Выберите профиль под свою стратегию. Кликните заголовок столбца для сортировки.</p>
                 `
+            },
+            screener: {
+                title: 'Скринер периодов - Анализ performance в ключевые моменты рынка',
+                content: `
+                    <p><strong>Что это:</strong> Оценка монет по методике Balanced для конкретных временных периодов. Позволяет увидеть, какие монеты показывали лучший результат в определенные моменты истории.</p>
+
+                    <p><strong>Методика:</strong> Используется формула Balanced профиля (Sharpe 20%, Sortino 20%, MaxDD 15%, Calmar 15%, Win Rate 10%, Up-Down 10%, Return 10%), применяемая к данным конкретного периода.</p>
+
+                    <p><strong>Как читать:</strong> <span style="color: #10b981;">90-100</span> — топ performance в период, <span style="color: #3b82f6;">50-89</span> — выше среднего, <span style="color: #ef4444;">0-49</span> — ниже среднего.</p>
+
+                    <p><strong>Применение:</strong> Кликните на заголовок периода для сортировки. Сравните performance монет в разные периоды для понимания их поведения в различных рыночных условиях.</p>
+                `
             }
         };
 
@@ -783,6 +861,9 @@
 
                 // Рассчитываем рейтинги
                 calculateRatings();
+
+                // Загружаем данные скринера
+                await loadPeriodMetrics();
 
                 // Сортируем по Sharpe Ratio (начальная сортировка)
                 sortData('sharpe');
@@ -850,6 +931,13 @@
             if (sortBy === 'ratings') {
                 currentSort = 'ratings';
                 renderRatingsTable();
+                return;
+            }
+
+            // Если это screener, переключаемся на таблицу скринера
+            if (sortBy === 'screener') {
+                currentSort = 'screener';
+                renderScreenerTable();
                 return;
             }
 
@@ -1021,6 +1109,8 @@
         document.getElementById('searchInput').addEventListener('input', function(e) {
             if (currentSort === 'ratings') {
                 renderRatingsTable(e.target.value);
+            } else if (currentSort === 'screener') {
+                renderScreenerTable();
             } else {
                 renderTable(e.target.value);
             }
