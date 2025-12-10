@@ -1030,6 +1030,17 @@
             tbody.innerHTML = rows.join('');
         }
 
+        // Функция форматирования score с цветом (используется в ratings и screener)
+        function formatScore(score) {
+            let colorClass = '';
+            if (score >= 90) colorClass = 'positive';
+            else if (score >= 70) colorClass = 'neutral';
+            else if (score >= 50) colorClass = 'neutral';
+            else colorClass = 'negative';
+
+            return `<span class="${colorClass}">${score.toFixed(1)}</span>`;
+        }
+
         // Рендер таблицы рейтингов
         function renderRatingsTable(filter = '') {
             const tbody = document.getElementById('tableBody');
@@ -1049,17 +1060,6 @@
                 conservative: (a, b) => b.conservativeScore - a.conservativeScore
             };
             filteredData.sort(sortFunctions[currentRatingSort]);
-
-            // Функция форматирования score с цветом
-            function formatScore(score) {
-                let colorClass = '';
-                if (score >= 90) colorClass = 'positive';
-                else if (score >= 70) colorClass = 'neutral';
-                else if (score >= 50) colorClass = 'neutral';
-                else colorClass = 'negative';
-
-                return `<span class="${colorClass}">${score.toFixed(1)}</span>`;
-            }
 
             const rows = filteredData.map((coin, index) => {
                 const logoHtml = coin.logo ? `<img src="${coin.logo}" alt="${coin.symbol}" class="coin-logo">` : '';
