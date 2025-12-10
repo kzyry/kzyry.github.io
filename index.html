@@ -175,6 +175,7 @@
 
         td {
             padding: 14px 12px;
+            border-bottom: 1px solid #333;
         }
 
         td.number {
@@ -751,7 +752,7 @@
                         <li><strong>🛡️ Conservative:</strong> Минимум риска (Sortino, Win Rate, низкие просадки и волатильность)</li>
                     </ul>
 
-                    <p><strong>Как читать:</strong> <span style="color: #10b981;">90-100</span> — топ монета, <span style="color: #3b82f6;">70-89</span> — выше среднего, <span style="color: #f59e0b;">50-69</span> — среднее, <span style="color: #ef4444;">0-49</span> — ниже среднего.</p>
+                    <p><strong>Как читать:</strong> <span style="color: #10b981;">90-100</span> — топ монета, <span style="color: #3b82f6;">50-89</span> — среднее и выше, <span style="color: #ef4444;">0-49</span> — ниже среднего.</p>
 
                     <p><strong>Применение:</strong> Выберите профиль под свою стратегию. Кликните заголовок столбца для сортировки.</p>
                 `
@@ -959,7 +960,7 @@
                 let colorClass = '';
                 if (score >= 90) colorClass = 'positive';
                 else if (score >= 70) colorClass = 'neutral';
-                else if (score >= 50) colorClass = 'warning';
+                else if (score >= 50) colorClass = 'neutral';
                 else colorClass = 'negative';
 
                 return `<span class="${colorClass}">${score.toFixed(1)}</span>`;
