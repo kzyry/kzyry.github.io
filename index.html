@@ -564,6 +564,8 @@
             }
 
             console.log('✅ periodMetricsData loaded:', Object.keys(periodMetricsData).length, 'periods');
+            console.log('📈 metricsData length:', metricsData.length);
+            console.log('🔢 First coin in metricsData:', metricsData[0]?.symbol);
 
             // Собираем данные
             const coinsWithScores = metricsData.map(coin => {
@@ -941,8 +943,11 @@
 
         // Сортировка данных
         function sortData(sortBy) {
+            console.log('🔄 sortData called with:', sortBy);
+
             // Если это ratings, переключаемся на рейтинговую таблицу
             if (sortBy === 'ratings') {
+                console.log('📊 Switching to ratings');
                 currentSort = 'ratings';
                 renderRatingsTable();
                 return;
@@ -950,6 +955,7 @@
 
             // Если это screener, переключаемся на таблицу скринера
             if (sortBy === 'screener') {
+                console.log('📋 Switching to screener');
                 currentSort = 'screener';
                 renderScreenerTable();
                 return;
