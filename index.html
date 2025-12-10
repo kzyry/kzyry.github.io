@@ -553,13 +553,17 @@
 
         // Рендеринг таблицы Скринера
         function renderScreenerTable() {
+            console.log('🎯 renderScreenerTable called');
             const tableBody = document.getElementById('tableBody');
             const tableHead = document.querySelector('#metricsTable thead tr');
 
             if (!periodMetricsData) {
+                console.log('⚠️ periodMetricsData is null!');
                 tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px;">Загрузка данных скринера...</td></tr>';
                 return;
             }
+
+            console.log('✅ periodMetricsData loaded:', Object.keys(periodMetricsData).length, 'periods');
 
             const periodHeaders = [];
             for (const [key, period] of Object.entries(periodMetricsData)) {

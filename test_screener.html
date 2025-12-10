@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Screener Table</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background: #333; color: white; }
+    </style>
+</head>
+<body>
+    <div id="output"></div>
+    <script>
+        fetch('period_metrics.json')
+            .then(r => r.json())
+            .then(periodData => {
+                fetch('real_metrics.json')
+                    .then(r => r.json())
+                    .then(metricsData => {
+                        const coins = Object.entries(metricsData).map(([symbol, data]) => ({
+                            symbol,
+                            ...data
+                        }));
+                        
+                        const coinsWithScores = coins.map(coin => {
+                            const scores = {};
+                            for (const [key, period] of Object.entries(periodData)) {
+                                scores[key] = period.scores[coin.symbol] || 0;
+                            }
+                            return { ...coin, periodScores: scores };
+                        });
+                        
+                        let html = '<h3>Period Keys: ' + Object.keys(periodData).join(', ') + '</h3>';
+                        html += '<table><tr><th>Монета</th>';
+                        for (const key of Object.keys(periodData)) {
+                            html += '<th>' + key + '</th>';
+                        }
+                        html += '</tr>';
+                        
+                        coinsWithScores.slice(0, 5).forEach(coin => {
+                            html += '<tr><td>' + coin.symbol + '</td>';
+                            for (const key of Object.keys(periodData)) {
+                                html += '<td>' + (coin.periodScores[key] || 0).toFixed(1) + '</td>';
+                            }
+                            html += '</tr>';
+                        });
+                        
+                        html += '</table>';
+                        document.getElementById('output').innerHTML = html;
+                    });
+            });
+    </script>
+</body>
+</html>
