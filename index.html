@@ -969,6 +969,11 @@
 
         // Рендер таблицы
         function renderTable(filter = '') {
+            // Не рендерим если активен другой режим
+            if (currentSort === 'ratings' || currentSort === 'screener') {
+                return;
+            }
+
             const tbody = document.getElementById('tableBody');
 
             // Восстанавливаем заголовки таблицы если они были изменены
