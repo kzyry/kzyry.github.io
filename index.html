@@ -212,7 +212,17 @@
         }
 
         .neutral {
-            color: #888;
+            color: #3b82f6;
+        }
+
+        .warning {
+            color: #f59e0b;
+        }
+
+        .rating-header.active-rating {
+            background: #3a3a3a;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
         }
 
         .coin-name {
@@ -406,6 +416,7 @@
             <div class="tab" data-sort="correlation">Корреляция</div>
             <div class="tab" data-sort="beta">Beta</div>
             <div class="tab" data-sort="maxdd">Max DD</div>
+            <div class="tab" data-sort="ratings">Рейтинги</div>
         </div>
 
         <div class="description-box" id="descriptionBox">
@@ -453,6 +464,123 @@
     <script>
         let metricsData = [];
         let currentSort = 'sharpe';
+        let ratingsData = []; // Данные с рейтингами
+        let currentRatingSort = 'aggressive'; // Текущая сортировка рейтингов
+
+        // Функция расчета Z-score
+        function calculateZScore(value, mean, stdDev) {
+            if (stdDev === 0) return 0;
+            return (value - mean) / stdDev;
+        }
+
+        // Функция расчета среднего
+        function mean(arr) {
+            return arr.reduce((sum, val) => sum + val, 0) / arr.length;
+        }
+
+        // Функция расчета стандартного отклонения
+        function stdDev(arr) {
+            const m = mean(arr);
+            const squareDiffs = arr.map(value => Math.pow(value - m, 2));
+            return Math.sqrt(mean(squareDiffs));
+        }
+
+        // Функция расчета рейтингов для всех монет
+        function calculateRatings() {
+            if (metricsData.length === 0) return;
+
+            // Извлекаем все значения для каждой метрики
+            const metrics = {
+                annual_return: metricsData.map(c => c.annual_return),
+                upside_capture: metricsData.map(c => c.upside_capture),
+                downside_capture: metricsData.map(c => Math.abs(c.downside_capture)),
+                sharpe_ratio: metricsData.map(c => c.sharpe_ratio),
+                sortino_ratio: metricsData.map(c => c.sortino_ratio),
+                calmar_ratio: metricsData.map(c => c.calmar_ratio),
+                win_rate: metricsData.map(c => c.win_rate),
+                max_drawdown: metricsData.map(c => c.max_drawdown),
+                annual_volatility: metricsData.map(c => c.annual_volatility)
+            };
+
+            // Вычисляем mean и stdDev для каждой метрики
+            const stats = {};
+            for (let key in metrics) {
+                stats[key] = {
+                    mean: mean(metrics[key]),
+                    stdDev: stdDev(metrics[key])
+                };
+            }
+
+            // Рассчитываем Z-scores и рейтинги для каждой монеты
+            ratingsData = metricsData.map(coin => {
+                // Z-scores для каждой метрики
+                const zScores = {
+                    annual_return: calculateZScore(coin.annual_return, stats.annual_return.mean, stats.annual_return.stdDev),
+                    upside_capture: calculateZScore(coin.upside_capture, stats.upside_capture.mean, stats.upside_capture.stdDev),
+                    downside_capture: calculateZScore(Math.abs(coin.downside_capture), stats.downside_capture.mean, stats.downside_capture.stdDev),
+                    sharpe_ratio: calculateZScore(coin.sharpe_ratio, stats.sharpe_ratio.mean, stats.sharpe_ratio.stdDev),
+                    sortino_ratio: calculateZScore(coin.sortino_ratio, stats.sortino_ratio.mean, stats.sortino_ratio.stdDev),
+                    calmar_ratio: calculateZScore(coin.calmar_ratio, stats.calmar_ratio.mean, stats.calmar_ratio.stdDev),
+                    win_rate: calculateZScore(coin.win_rate, stats.win_rate.mean, stats.win_rate.stdDev),
+                    max_drawdown: calculateZScore(coin.max_drawdown, stats.max_drawdown.mean, stats.max_drawdown.stdDev),
+                    annual_volatility: calculateZScore(coin.annual_volatility, stats.annual_volatility.mean, stats.annual_volatility.stdDev),
+                    updown_diff: calculateZScore(
+                        coin.upside_capture - Math.abs(coin.downside_capture),
+                        mean(metricsData.map(c => c.upside_capture - Math.abs(c.downside_capture))),
+                        stdDev(metricsData.map(c => c.upside_capture - Math.abs(c.downside_capture)))
+                    )
+                };
+
+                // Aggressive Score: Return (25%), Upside (25%), Sharpe (20%), Calmar (15%), Sortino (15%)
+                const aggressiveScore =
+                    zScores.annual_return * 0.25 +
+                    zScores.upside_capture * 0.25 +
+                    zScores.sharpe_ratio * 0.20 +
+                    zScores.calmar_ratio * 0.15 +
+                    zScores.sortino_ratio * 0.15;
+
+                // Balanced Score: Sharpe (25%), Sortino (20%), Win Rate (15%), Calmar (15%), UpDown (15%), Return (10%)
+                const balancedScore =
+                    zScores.sharpe_ratio * 0.25 +
+                    zScores.sortino_ratio * 0.20 +
+                    zScores.win_rate * 0.15 +
+                    zScores.calmar_ratio * 0.15 +
+                    zScores.updown_diff * 0.15 +
+                    zScores.annual_return * 0.10;
+
+                // Conservative Score: Sortino (30%), Win Rate (25%), MaxDD инверт (20%), Sharpe (15%), Volatility инверт (10%)
+                const conservativeScore =
+                    zScores.sortino_ratio * 0.30 +
+                    zScores.win_rate * 0.25 +
+                    (-zScores.max_drawdown) * 0.20 + // Инверт: меньше просадка = лучше
+                    zScores.sharpe_ratio * 0.15 +
+                    (-zScores.annual_volatility) * 0.10; // Инверт: меньше волатильность = лучше
+
+                return {
+                    symbol: coin.symbol,
+                    name: coin.name,
+                    logo: coin.logo,
+                    rank: coin.rank,
+                    aggressiveScore,
+                    balancedScore,
+                    conservativeScore
+                };
+            });
+
+            // Нормализуем scores в диапазон 0-100
+            ['aggressiveScore', 'balancedScore', 'conservativeScore'].forEach(scoreType => {
+                const scores = ratingsData.map(c => c[scoreType]);
+                const minScore = Math.min(...scores);
+                const maxScore = Math.max(...scores);
+                const range = maxScore - minScore;
+
+                ratingsData.forEach(coin => {
+                    coin[scoreType] = range > 0
+                        ? ((coin[scoreType] - minScore) / range) * 100
+                        : 50;
+                });
+            });
+        }
 
         // Описания для каждого таба
         const descriptions = {
@@ -619,6 +747,43 @@
                     <p><strong>Применение:</strong> Используйте доходность вместе с другими метриками. Лучшие монеты: высокая доходность + высокий Sharpe + низкий Max DD. Не гонитесь только за доходностью!</p>
                     <p><strong>Сортировка:</strong> Таблица отсортирована от наибольшей доходности к наименьшей.</p>
                 `
+            },
+            ratings: {
+                title: 'Комплексные рейтинги - Агрегированная оценка по профилям',
+                content: `
+                    <p><strong>Что это:</strong> Агрегированная оценка монет по трем инвестиционным профилям. Каждый профиль использует Z-score нормализацию и взвешенную сумму ключевых метрик для создания итогового балла от 0 до 100.</p>
+
+                    <p><strong>Методология:</strong></p>
+                    <ul>
+                        <li><strong>Z-Score нормализация:</strong> Каждая метрика преобразуется в Z-score, показывающий на сколько стандартных отклонений монета лучше/хуже среднего</li>
+                        <li><strong>Взвешенная сумма:</strong> Z-scores умножаются на веса (важность метрики в профиле) и суммируются</li>
+                        <li><strong>Нормализация 0-100:</strong> Итоговый балл масштабируется в диапазон 0-100, где 100 = лучшая монета</li>
+                    </ul>
+
+                    <p><strong>Профили:</strong></p>
+                    <ul>
+                        <li><strong>⚡ Aggressive (Агрессивный):</strong> Максимум прибыли
+                            <br>• Annual Return (25%), Upside Capture (25%), Sharpe (20%), Calmar (15%), Sortino (15%)
+                        </li>
+                        <li><strong>📊 Balanced (Сбалансированный):</strong> Баланс риск/доходность
+                            <br>• Sharpe (25%), Sortino (20%), Win Rate (15%), Calmar (15%), Up-Down разница (15%), Return (10%)
+                        </li>
+                        <li><strong>🛡️ Conservative (Консервативный):</strong> Минимум риска
+                            <br>• Sortino (30%), Win Rate (25%), Max DD инверт (20%), Sharpe (15%), Volatility инверт (10%)
+                        </li>
+                    </ul>
+
+                    <p><strong>Интерпретация:</strong></p>
+                    <ul>
+                        <li><span style="color: #10b981;">90-100</span> — Выдающаяся монета по этому профилю</li>
+                        <li><span style="color: #3b82f6;">70-89</span> — Отличная монета, выше среднего</li>
+                        <li><span style="color: #f59e0b;">50-69</span> — Средняя монета, около среднего уровня</li>
+                        <li><span style="color: #ef4444;">0-49</span> — Ниже среднего, высокий риск для профиля</li>
+                    </ul>
+
+                    <p><strong>Применение:</strong> Выберите профиль, соответствующий вашей стратегии. Агрессивный инвестор смотрит на Aggressive, консервативный - на Conservative. Монета может быть топ-1 в Aggressive и топ-50 в Conservative - это нормально!</p>
+                    <p><strong>Сортировка:</strong> Кликните на заголовок столбца (Aggressive/Balanced/Conservative) для сортировки. По умолчанию сортировка по Aggressive.</p>
+                `
             }
         };
 
@@ -643,6 +808,9 @@
                     symbol,
                     ...metrics
                 }));
+
+                // Рассчитываем рейтинги
+                calculateRatings();
 
                 // Сортируем по Sharpe Ratio (начальная сортировка)
                 sortData('sharpe');
@@ -706,6 +874,13 @@
 
         // Сортировка данных
         function sortData(sortBy) {
+            // Если это ratings, переключаемся на рейтинговую таблицу
+            if (sortBy === 'ratings') {
+                currentSort = 'ratings';
+                renderRatingsTable();
+                return;
+            }
+
             const sortFunctions = {
                 sharpe: (a, b) => b.sharpe_ratio - a.sharpe_ratio,
                 sortino: (a, b) => b.sortino_ratio - a.sortino_ratio,
@@ -728,6 +903,25 @@
         // Рендер таблицы
         function renderTable(filter = '') {
             const tbody = document.getElementById('tableBody');
+
+            // Восстанавливаем заголовки таблицы если они были изменены
+            const thead = document.querySelector('#metricsTable thead tr');
+            if (!thead.innerHTML.includes('Sharpe')) {
+                thead.innerHTML = `
+                    <th>#</th>
+                    <th>Монета</th>
+                    <th class="number" data-col="sharpe">Sharpe</th>
+                    <th class="number" data-col="sortino">Sortino</th>
+                    <th class="number" data-col="calmar">Calmar</th>
+                    <th class="number" data-col="winrate">Win%</th>
+                    <th class="number" data-col="updown">Up/Down</th>
+                    <th class="number" data-col="return">Доходность</th>
+                    <th class="number" data-col="volatility">Волатильность</th>
+                    <th class="number" data-col="correlation">Корреляция</th>
+                    <th class="number" data-col="beta">Beta</th>
+                    <th class="number" data-col="maxdd">Max DD</th>
+                `;
+            }
 
             let filteredData = metricsData;
             if (filter) {
@@ -769,6 +963,78 @@
             tbody.innerHTML = rows.join('');
         }
 
+        // Рендер таблицы рейтингов
+        function renderRatingsTable(filter = '') {
+            const tbody = document.getElementById('tableBody');
+
+            let filteredData = ratingsData;
+            if (filter) {
+                filteredData = ratingsData.filter(coin =>
+                    coin.symbol.toLowerCase().includes(filter.toLowerCase()) ||
+                    coin.name.toLowerCase().includes(filter.toLowerCase())
+                );
+            }
+
+            // Сортируем по текущему профилю
+            const sortFunctions = {
+                aggressive: (a, b) => b.aggressiveScore - a.aggressiveScore,
+                balanced: (a, b) => b.balancedScore - a.balancedScore,
+                conservative: (a, b) => b.conservativeScore - a.conservativeScore
+            };
+            filteredData.sort(sortFunctions[currentRatingSort]);
+
+            // Функция форматирования score с цветом
+            function formatScore(score) {
+                let colorClass = '';
+                if (score >= 90) colorClass = 'positive';
+                else if (score >= 70) colorClass = 'neutral';
+                else if (score >= 50) colorClass = 'warning';
+                else colorClass = 'negative';
+
+                return `<span class="${colorClass}">${score.toFixed(1)}</span>`;
+            }
+
+            const rows = filteredData.map((coin, index) => {
+                const logoHtml = coin.logo ? `<img src="${coin.logo}" alt="${coin.symbol}" class="coin-logo">` : '';
+                const rankHtml = coin.rank ? `<span class="coin-rank">#${coin.rank}</span>` : '';
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>
+                            <div class="coin-name">
+                                ${logoHtml}
+                                <span>${coin.symbol}</span>
+                                ${rankHtml}
+                            </div>
+                        </td>
+                        <td class="number rating-col" data-rating="aggressive">${formatScore(coin.aggressiveScore)}</td>
+                        <td class="number rating-col" data-rating="balanced">${formatScore(coin.balancedScore)}</td>
+                        <td class="number rating-col" data-rating="conservative">${formatScore(coin.conservativeScore)}</td>
+                    </tr>
+                `;
+            });
+
+            // Обновляем заголовки таблицы для рейтингов
+            const thead = document.querySelector('#metricsTable thead tr');
+            thead.innerHTML = `
+                <th>#</th>
+                <th>Монета</th>
+                <th class="number rating-header ${currentRatingSort === 'aggressive' ? 'active-rating' : ''}" data-rating="aggressive" style="cursor: pointer;">⚡ Aggressive</th>
+                <th class="number rating-header ${currentRatingSort === 'balanced' ? 'active-rating' : ''}" data-rating="balanced" style="cursor: pointer;">📊 Balanced</th>
+                <th class="number rating-header ${currentRatingSort === 'conservative' ? 'active-rating' : ''}" data-rating="conservative" style="cursor: pointer;">🛡️ Conservative</th>
+            `;
+
+            tbody.innerHTML = rows.join('');
+
+            // Добавляем обработчики для кликабельных заголовков
+            document.querySelectorAll('.rating-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    currentRatingSort = this.dataset.rating;
+                    renderRatingsTable(filter);
+                });
+            });
+        }
+
         // Обработчики событий
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', function() {
@@ -781,7 +1047,11 @@
         });
 
         document.getElementById('searchInput').addEventListener('input', function(e) {
-            renderTable(e.target.value);
+            if (currentSort === 'ratings') {
+                renderRatingsTable(e.target.value);
+            } else {
+                renderTable(e.target.value);
+            }
         });
 
         // Переключение страниц
