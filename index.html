@@ -16,12 +16,69 @@
             background: #0a0a0a;
             color: #e0e0e0;
             line-height: 1.6;
+            padding-top: 80px;
+        }
+
+        .header-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 1000;
+        }
+
+        .header-nav .logo {
+            font-size: 1.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-nav nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        .header-nav nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .header-nav nav a:hover {
+            color: #667eea;
+        }
+
+        .header-nav nav a.active {
+            color: #fff;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 4px;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
         }
 
         header {
@@ -323,12 +380,22 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="🔍 Поиск по названию монеты...">
-        </div>
+    <div class="header-nav">
+        <div class="logo">TokenSort</div>
+        <nav>
+            <a href="#" class="nav-link active" data-page="metrics">Метрики</a>
+            <a href="#" class="nav-link" data-page="screener">Скринер</a>
+        </nav>
+    </div>
 
-        <div class="tabs">
+    <div class="container">
+        <!-- Страница: Метрики -->
+        <div id="metricsPage" class="page active">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Поиск по названию монеты...">
+            </div>
+
+            <div class="tabs">
             <div class="tab active" data-sort="sharpe">Sharpe</div>
             <div class="tab" data-sort="sortino">Sortino</div>
             <div class="tab" data-sort="calmar">Calmar</div>
@@ -369,9 +436,18 @@
             </table>
         </div>
 
-        <footer>
-            <p>Источник данных: CoinGecko Pro API | Монет проанализировано: <span id="coinCount">77</span></p>
-        </footer>
+            <footer>
+                <p>Источник данных: CoinGecko Pro API | Монет проанализировано: <span id="coinCount">77</span></p>
+            </footer>
+        </div>
+
+        <!-- Страница: Скринер -->
+        <div id="screenerPage" class="page">
+            <div style="text-align: center; padding: 100px 20px;">
+                <h2 style="font-size: 2em; margin-bottom: 20px; color: #667eea;">Скринер криптовалют</h2>
+                <p style="color: #888; font-size: 1.1em;">Функционал скринера в разработке...</p>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -706,6 +782,33 @@
 
         document.getElementById('searchInput').addEventListener('input', function(e) {
             renderTable(e.target.value);
+        });
+
+        // Переключение страниц
+        function switchPage(pageName) {
+            // Скрываем все страницы
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Показываем нужную страницу
+            const pageId = pageName === 'metrics' ? 'metricsPage' : 'screenerPage';
+            document.getElementById(pageId).classList.add('active');
+
+            // Обновляем активную ссылку в навигации
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`[data-page="${pageName}"]`).classList.add('active');
+        }
+
+        // Обработчики навигации
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const pageName = this.getAttribute('data-page');
+                switchPage(pageName);
+            });
         });
 
         // Загрузка данных при старте
