@@ -27,24 +27,16 @@
             height: 80px;
             background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
             border-bottom: 1px solid #333;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 40px;
             z-index: 1000;
         }
 
-        .header-nav .logo {
-            font-size: 1.5em;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
         .header-nav nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            height: 100%;
             display: flex;
+            align-items: center;
             gap: 30px;
         }
 
@@ -125,14 +117,15 @@
         }
 
         .tab {
-            padding: 12px 24px;
+            padding: 8px 16px;
             background: #1a1a1a;
             border: 2px solid #333;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
             white-space: nowrap;
             font-weight: 500;
+            font-size: 14px;
         }
 
         .tab:hover {
@@ -182,7 +175,6 @@
 
         td {
             padding: 14px 12px;
-            border-bottom: 1px solid #2a2a2a;
         }
 
         td.number {
@@ -391,7 +383,6 @@
 </head>
 <body>
     <div class="header-nav">
-        <div class="logo">TokenSort</div>
         <nav>
             <a href="#" class="nav-link active" data-page="metrics">Метрики</a>
             <a href="#" class="nav-link" data-page="screener">Скринер</a>
