@@ -523,28 +523,29 @@
                     )
                 };
 
-                // Aggressive Score: Return (40%), Upside (30%), Calmar (20%), Sharpe (10%)
+                // Aggressive Score: Return (35%), Upside (40%), Calmar (15%), Sharpe (10%)
                 const aggressiveScore =
-                    zScores.annual_return * 0.40 +
-                    zScores.upside_capture * 0.30 +
-                    zScores.calmar_ratio * 0.20 +
+                    zScores.annual_return * 0.35 +
+                    zScores.upside_capture * 0.40 +
+                    zScores.calmar_ratio * 0.15 +
                     zScores.sharpe_ratio * 0.10;
 
-                // Balanced Score: Sharpe (25%), Sortino (20%), Win Rate (15%), Calmar (15%), UpDown (15%), Return (10%)
+                // Balanced Score: Sharpe (20%), Sortino (20%), MaxDD (15%), Calmar (15%), Win Rate (10%), UpDown (10%), Return (10%)
                 const balancedScore =
-                    zScores.sharpe_ratio * 0.25 +
+                    zScores.sharpe_ratio * 0.20 +
                     zScores.sortino_ratio * 0.20 +
-                    zScores.win_rate * 0.15 +
+                    zScores.max_drawdown * 0.15 + // Меньше просадка = выше z-score
                     zScores.calmar_ratio * 0.15 +
-                    zScores.updown_diff * 0.15 +
+                    zScores.win_rate * 0.10 +
+                    zScores.updown_diff * 0.10 +
                     zScores.annual_return * 0.10;
 
-                // Conservative Score: MaxDD инверт (35%), Volatility инверт (25%), Win Rate (20%), Sortino (15%), Sharpe (5%)
+                // Conservative Score: MaxDD (45%), Volatility инверт (30%), Sortino (15%), Win Rate (5%), Sharpe (5%)
                 const conservativeScore =
-                    (-zScores.max_drawdown) * 0.35 + // Инверт: меньше просадка = лучше
-                    (-zScores.annual_volatility) * 0.25 + // Инверт: меньше волатильность = лучше
-                    zScores.win_rate * 0.20 +
+                    zScores.max_drawdown * 0.45 + // Меньше просадка (ближе к 0) = выше z-score
+                    (-zScores.annual_volatility) * 0.30 + // Инверт: меньше волатильность = лучше
                     zScores.sortino_ratio * 0.15 +
+                    zScores.win_rate * 0.05 +
                     zScores.sharpe_ratio * 0.05;
 
                 return {
@@ -746,9 +747,9 @@
 
                     <p><strong>Профили:</strong></p>
                     <ul>
-                        <li><strong>⚡ Aggressive:</strong> Максимум прибыли (Return 40%, Upside 30%, Calmar 20%, Sharpe 10%)</li>
-                        <li><strong>📊 Balanced:</strong> Баланс (Sharpe 25%, Sortino 20%, Win Rate 15%, Calmar 15%, Up-Down 15%, Return 10%)</li>
-                        <li><strong>🛡️ Conservative:</strong> Минимум риска (Низкие просадки 35%, Низкая волатильность 25%, Win Rate 20%, Sortino 15%, Sharpe 5%)</li>
+                        <li><strong>⚡ Aggressive:</strong> Максимум прибыли (Upside 40%, Return 35%, Calmar 15%, Sharpe 10%)</li>
+                        <li><strong>📊 Balanced:</strong> Баланс (Sharpe 20%, Sortino 20%, MaxDD 15%, Calmar 15%, Win Rate 10%, Up-Down 10%, Return 10%)</li>
+                        <li><strong>🛡️ Conservative:</strong> Минимум риска (Низкие просадки 45%, Низкая волатильность 30%, Sortino 15%, Win Rate 5%, Sharpe 5%)</li>
                     </ul>
 
                     <p><strong>Как читать:</strong> <span style="color: #10b981;">90-100</span> — топ монета, <span style="color: #3b82f6;">50-89</span> — среднее и выше, <span style="color: #ef4444;">0-49</span> — ниже среднего.</p>
