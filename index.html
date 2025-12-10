@@ -565,6 +565,50 @@
 
             console.log('✅ periodMetricsData loaded:', Object.keys(periodMetricsData).length, 'periods');
 
+            // Собираем данные
+            const coinsWithScores = metricsData.map(coin => {
+                const scores = {};
+                for (const [key, period] of Object.entries(periodMetricsData)) {
+                    scores[key] = period.scores[coin.symbol] || 0;
+                }
+                return { ...coin, periodScores: scores };
+            });
+
+            coinsWithScores.sort((a, b) => {
+                const aVal = a.periodScores[screenerSortColumn] || 0;
+                const bVal = b.periodScores[screenerSortColumn] || 0;
+                return bVal - aVal;
+            });
+
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = search ? coinsWithScores.filter(c =>
+                c.symbol.toLowerCase().includes(search) ||
+                c.name.toLowerCase().includes(search)
+            ) : coinsWithScores;
+
+            // Создаем строки
+            const rows = filtered.map((coin, index) => {
+                const periodCells = Object.keys(periodMetricsData).map(key => {
+                    const score = coin.periodScores[key] || 0;
+                    return `<td style="text-align: center;">${formatScore(score)}</td>`;
+                }).join('');
+
+                return `
+                    <tr>
+                        <td class="sticky-col" style="text-align: center;">${index + 1}</td>
+                        <td class="sticky-col">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <img src="${coin.logo}" alt="${coin.symbol}" style="width: 24px; height: 24px; border-radius: 50%;">
+                                <strong>${coin.symbol}</strong>
+                                <span style="color: #666; font-size: 0.85em;">#${coin.rank}</span>
+                            </div>
+                        </td>
+                        ${periodCells}
+                    </tr>
+                `;
+            });
+
+            // Обновляем заголовки
             const periodHeaders = [];
             for (const [key, period] of Object.entries(periodMetricsData)) {
                 const [startDate, endDate] = period.label.split(' - ');
@@ -592,47 +636,10 @@
                 </tr>
             `;
 
-            const coinsWithScores = metricsData.map(coin => {
-                const scores = {};
-                for (const [key, period] of Object.entries(periodMetricsData)) {
-                    scores[key] = period.scores[coin.symbol] || 0;
-                }
-                return { ...coin, periodScores: scores };
-            });
+            // Обновляем tbody
+            tableBody.innerHTML = rows.join('');
 
-            coinsWithScores.sort((a, b) => {
-                const aVal = a.periodScores[screenerSortColumn] || 0;
-                const bVal = b.periodScores[screenerSortColumn] || 0;
-                return bVal - aVal;
-            });
-
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = search ? coinsWithScores.filter(c =>
-                c.symbol.toLowerCase().includes(search) ||
-                c.name.toLowerCase().includes(search)
-            ) : coinsWithScores;
-
-            tableBody.innerHTML = filtered.map((coin, index) => {
-                const periodCells = Object.keys(periodMetricsData).map(key => {
-                    const score = coin.periodScores[key] || 0;
-                    return `<td style="text-align: center;">${formatScore(score)}</td>`;
-                }).join('');
-
-                return `
-                    <tr>
-                        <td class="sticky-col" style="text-align: center;">${index + 1}</td>
-                        <td class="sticky-col">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <img src="${coin.logo}" alt="${coin.symbol}" style="width: 24px; height: 24px; border-radius: 50%;">
-                                <strong>${coin.symbol}</strong>
-                                <span style="color: #666; font-size: 0.85em;">#${coin.rank}</span>
-                            </div>
-                        </td>
-                        ${periodCells}
-                    </tr>
-                `;
-            }).join('');
-
+            // Добавляем обработчики кликов
             document.querySelectorAll('.sortable-period').forEach(th => {
                 th.addEventListener('click', () => {
                     screenerSortColumn = th.dataset.period;
