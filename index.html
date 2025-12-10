@@ -589,11 +589,16 @@
             ) : coinsWithScores;
 
             // Создаем строки
+            console.log('🔨 Creating rows for', filtered.length, 'coins');
             const rows = filtered.map((coin, index) => {
                 const periodCells = Object.keys(periodMetricsData).map(key => {
                     const score = coin.periodScores[key] || 0;
                     return `<td style="text-align: center;">${formatScore(score)}</td>`;
                 }).join('');
+
+                if (index === 0) {
+                    console.log('🪙 First coin:', coin.symbol, 'scores:', coin.periodScores);
+                }
 
                 return `
                     <tr>
@@ -609,6 +614,7 @@
                     </tr>
                 `;
             });
+            console.log('📝 Created', rows.length, 'rows');
 
             // Обновляем заголовки
             const periodHeaders = [];
@@ -623,7 +629,6 @@
             }
 
             tableHead.innerHTML = `
-                <tr>
                     <th class="sticky-col" style="width: 60px;">№</th>
                     <th class="sticky-col" style="width: 180px;">Монета</th>
                     ${periodHeaders.map(p => `
@@ -635,23 +640,39 @@
                             </div>
                         </th>
                     `).join('')}
-                </tr>
             `;
 
             // Обновляем tbody
-            tableBody.innerHTML = rows.join('');
+            console.log('🎯 Before updating tbody, current innerHTML length:', tableBody.innerHTML.length);
+            console.log('🎯 New rows HTML length:', rows.join('').length);
+            console.log('🎯 First row preview:', rows[0] ? rows[0].substring(0, 200) : 'No rows');
+            console.log('🎯 tableBody element exists:', !!tableBody);
+            console.log('🎯 tableBody id:', tableBody?.id);
 
-            // Добавляем обработчики кликов
-            document.querySelectorAll('.sortable-period').forEach(th => {
-                th.addEventListener('click', () => {
-                    screenerSortColumn = th.dataset.period;
-                    renderScreenerTable();
+            // Сохраняем HTML для проверки
+            const newHTML = rows.join('');
+
+            // Принудительно очищаем и обновляем
+            tableBody.innerHTML = '';
+
+            // Используем setTimeout чтобы дать браузеру время обновить DOM
+            setTimeout(() => {
+                tableBody.innerHTML = newHTML;
+                console.log('✅ After updating tbody (in setTimeout), new innerHTML length:', tableBody.innerHTML.length);
+                console.log('✅ First child of tbody:', tableBody.firstElementChild?.tagName);
+
+                // Добавляем обработчики кликов после обновления DOM
+                document.querySelectorAll('.sortable-period').forEach(th => {
+                    th.addEventListener('click', () => {
+                        screenerSortColumn = th.dataset.period;
+                        renderScreenerTable();
+                    });
+
+                    if (th.dataset.period === screenerSortColumn) {
+                        th.style.background = 'rgba(102, 126, 234, 0.3)';
+                    }
                 });
-
-                if (th.dataset.period === screenerSortColumn) {
-                    th.style.background = 'rgba(102, 126, 234, 0.3)';
-                }
-            });
+            }, 0);
         }
 
         // ========== END SCREENER FUNCTIONS ==========

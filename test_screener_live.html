@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Screener Live</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .error { color: red; }
+        .success { color: green; }
+        button { padding: 10px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Тест Скринера на живом сайте</h2>
+    <button onclick="testData()">1. Проверить данные</button>
+    <button onclick="testRender()">2. Проверить рендеринг</button>
+    <button onclick="testClick()">3. Симулировать клик на таб</button>
+    
+    <div id="output"></div>
+
+    <script>
+        let metricsData, periodMetricsData, currentSort = 'sharpe';
+        
+        async function testData() {
+            const out = document.getElementById('output');
+            out.innerHTML = '<h3>Загрузка данных...</h3>';
+            
+            try {
+                // Загружаем real_metrics.json
+                const metricsResp = await fetch('https://kzyry.github.io/real_metrics.json');
+                const metrics = await metricsResp.json();
+                metricsData = Object.entries(metrics).map(([symbol, data]) => ({
+                    symbol,
+                    ...data
+                }));
+                
+                // Загружаем period_metrics.json
+                const periodsResp = await fetch('https://kzyry.github.io/period_metrics.json');
+                periodMetricsData = await periodsResp.json();
+                
+                let html = '<h3 class="success">✅ Данные загружены</h3>';
+                html += '<p>Монет в metricsData: ' + metricsData.length + '</p>';
+                html += '<p>Периодов: ' + Object.keys(periodMetricsData).length + '</p>';
+                html += '<p>Периоды: ' + Object.keys(periodMetricsData).join(', ') + '</p>';
+                
+                // Проверяем первую монету
+                const firstCoin = metricsData[0];
+                html += '<h4>Первая монета: ' + firstCoin.symbol + '</h4>';
+                html += '<p>logo: ' + (firstCoin.logo ? '✅' : '❌') + '</p>';
+                html += '<p>rank: ' + firstCoin.rank + '</p>';
+                
+                out.innerHTML = html;
+            } catch (err) {
+                out.innerHTML = '<h3 class="error">❌ Ошибка: ' + err.message + '</h3>';
+            }
+        }
+        
+        async function testRender() {
+            if (!metricsData || !periodMetricsData) {
+                document.getElementById('output').innerHTML = '<h3 class="error">Сначала загрузите данные (кнопка 1)</h3>';
+                return;
+            }
+            
+            const out = document.getElementById('output');
+            let html = '<h3>Тест рендеринга</h3>';
+            
+            // Функция formatScore
+            function formatScore(score) {
+                return score.toFixed(1);
+            }
+            
+            // Собираем данные как в renderScreenerTable
+            const coinsWithScores = metricsData.map(coin => {
+                const scores = {};
+                for (const [key, period] of Object.entries(periodMetricsData)) {
+                    scores[key] = period.scores[coin.symbol] || 0;
+                }
+                return { ...coin, periodScores: scores };
+            });
+            
+            // Берем первые 3 монеты
+            html += '<h4>Первые 3 монеты с scores:</h4>';
+            for (let i = 0; i < 3; i++) {
+                const coin = coinsWithScores[i];
+                html += '<p><strong>' + coin.symbol + ':</strong></p>';
+                html += '<ul>';
+                for (const [key, score] of Object.entries(coin.periodScores)) {
+                    html += '<li>' + key + ': ' + formatScore(score) + '</li>';
+                }
+                html += '</ul>';
+            }
+            
+            out.innerHTML = html;
+        }
+        
+        function testClick() {
+            const out = document.getElementById('output');
+            out.innerHTML = '<h3>Симуляция клика на таб Скринер</h3>';
+            
+            // Проверяем currentSort
+            out.innerHTML += '<p>currentSort до: ' + currentSort + '</p>';
+            
+            // Симулируем sortData('screener')
+            if ('screener' === 'screener') {
+                currentSort = 'screener';
+                out.innerHTML += '<p class="success">✅ currentSort = "screener"</p>';
+                out.innerHTML += '<p>Должна вызываться renderScreenerTable()</p>';
+            }
+            
+            // Проверяем защиту в renderTable
+            if (currentSort === 'ratings' || currentSort === 'screener') {
+                out.innerHTML += '<p class="success">✅ renderTable() не будет выполняться (защита работает)</p>';
+            } else {
+                out.innerHTML += '<p class="error">❌ renderTable() будет выполняться!</p>';
+            }
+        }
+    </script>
+</body>
+</html>

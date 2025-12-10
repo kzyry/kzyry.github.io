@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Screener Fix</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #333; color: white; }
+        .success { color: green; }
+        .error { color: red; }
+        .tab { padding: 10px 20px; margin: 5px; cursor: pointer; background: #eee; display: inline-block; }
+        .tab.active { background: #333; color: white; }
+    </style>
+</head>
+<body>
+    <h2>Test Screener Table Update Fix</h2>
+
+    <div>
+        <div class="tab active" onclick="showMetrics()">Metrics Tab</div>
+        <div class="tab" onclick="showScreener()">Screener Tab</div>
+    </div>
+
+    <table>
+        <thead>
+            <tr id="tableHead">
+                <th>Column 1</th>
+                <th>Column 2</th>
+                <th>Column 3</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr><td>Initial</td><td>Data</td><td>Here</td></tr>
+        </tbody>
+    </table>
+
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+
+        function log(msg, isError = false) {
+            const div = document.createElement('div');
+            div.className = isError ? 'error' : 'success';
+            div.textContent = new Date().toLocaleTimeString() + ' - ' + msg;
+            output.appendChild(div);
+        }
+
+        function showMetrics() {
+            log('Switching to Metrics');
+
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update table header
+            const tableHead = document.getElementById('tableHead');
+            tableHead.innerHTML = `
+                <th>Metric</th>
+                <th>Value</th>
+                <th>Score</th>
+            `;
+
+            // Update table body
+            const tableBody = document.getElementById('tableBody');
+            const newHTML = `
+                <tr><td>Sharpe</td><td>1.5</td><td>85</td></tr>
+                <tr><td>Sortino</td><td>2.0</td><td>90</td></tr>
+                <tr><td>Calmar</td><td>1.2</td><td>75</td></tr>
+            `;
+
+            // Old way (might not work)
+            // tableBody.innerHTML = newHTML;
+
+            // New way with fix
+            tableBody.innerHTML = '';
+            setTimeout(() => {
+                tableBody.innerHTML = newHTML;
+                log('✅ Metrics table updated');
+            }, 0);
+        }
+
+        function showScreener() {
+            log('Switching to Screener');
+
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update table header
+            const tableHead = document.getElementById('tableHead');
+            tableHead.innerHTML = `
+                <th>Coin</th>
+                <th>Period 1</th>
+                <th>Period 2</th>
+                <th>Period 3</th>
+            `;
+
+            // Update table body
+            const tableBody = document.getElementById('tableBody');
+            const newHTML = `
+                <tr><td>BTC</td><td>95.2</td><td>88.3</td><td>91.7</td></tr>
+                <tr><td>ETH</td><td>89.1</td><td>92.4</td><td>85.6</td></tr>
+                <tr><td>SOL</td><td>78.5</td><td>81.9</td><td>84.2</td></tr>
+            `;
+
+            // Clear first
+            log('Clearing table body...');
+            tableBody.innerHTML = '';
+
+            // Then update with setTimeout
+            setTimeout(() => {
+                log('Updating table body...');
+                tableBody.innerHTML = newHTML;
+                log('✅ Screener table updated - rows: ' + tableBody.children.length);
+            }, 0);
+        }
+    </script>
+</body>
+</html>
