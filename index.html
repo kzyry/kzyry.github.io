@@ -553,6 +553,9 @@
 
         // Рендеринг таблицы Скринера
         function renderScreenerTable() {
+            const tableBody = document.getElementById('tableBody');
+            const tableHead = document.querySelector('#metricsTable thead tr');
+
             if (!periodMetricsData) {
                 tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px;">Загрузка данных скринера...</td></tr>';
                 return;
