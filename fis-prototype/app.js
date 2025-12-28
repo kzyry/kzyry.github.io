@@ -422,7 +422,9 @@ function renderApprovalPanel(product) {
         'Продуктолог': 'productolog',
         'Андеррайтер': 'underwriter',
         'Актуарий': 'actuary',
-        'Методолог': 'methodologist'
+        'Методолог': 'methodologist',
+        'Юрист': 'lawyer',
+        'Финансист': 'financier'
     };
 
     Object.keys(roleMap).forEach(role => {
@@ -455,6 +457,53 @@ function renderApprovalPanel(product) {
             actionsEl.innerHTML = '';
         }
     });
+
+    // Add return buttons in "approved" status
+    if (product.status === 'approved') {
+        const currentRole = currentUser?.role;
+
+        // For all roles except Продуктолог - show "Request Return" button
+        if (currentRole && currentRole !== 'Продуктолог') {
+            const actionsEl = document.getElementById(`approval-actions-${roleMap[currentRole]}`);
+            if (actionsEl) {
+                actionsEl.innerHTML = `
+                    <button class="btn btn-warning btn-sm" onclick="requestReturnToApproval(${product.id})">
+                        🔄 Попросить вернуть на согласование
+                    </button>
+                `;
+            }
+        }
+
+        // For Продуктолог - show direct "Return" button and return requests
+        if (currentRole === 'Продуктолог') {
+            const actionsEl = document.getElementById(`approval-actions-productolog`);
+            if (actionsEl) {
+                const returnRequests = product.returnRequests || [];
+                const pendingRequests = returnRequests.filter(r => r.status === 'pending');
+
+                let html = `
+                    <button class="btn btn-secondary btn-sm" onclick="returnToApproval(${product.id})">
+                        ← Вернуть на согласование
+                    </button>
+                `;
+
+                // Show pending return requests
+                if (pendingRequests.length > 0) {
+                    html += `<div class="return-requests" style="margin-top: 12px; padding: 12px; background: rgba(255, 152, 0, 0.1); border-left: 3px solid #FF9800; border-radius: 4px;">
+                        <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #FF9800;">⚠️ Запросы на возврат:</h4>
+                        ${pendingRequests.map(r => `
+                            <div style="font-size: 12px; margin-bottom: 6px;">
+                                <strong>${r.role}:</strong> ${r.comment}<br>
+                                <small style="color: var(--text-secondary);">${new Date(r.date).toLocaleString('ru-RU')}</small>
+                            </div>
+                        `).join('')}
+                    </div>`;
+                }
+
+                actionsEl.innerHTML = html;
+            }
+        }
+    }
 }
 
 function approveProduct() {
@@ -469,6 +518,70 @@ function showRejectModal() {
     if (comment) {
         rejectByRole(AppState.currentProduct, currentUser.role, comment);
     }
+}
+
+function requestReturnToApproval(productId) {
+    const comment = prompt('Укажите причину запроса возврата на согласование:');
+
+    if (!comment || comment.trim() === '') {
+        showToast('Комментарий обязателен', 'error');
+        return;
+    }
+
+    const product = AppState.products.find(p => p.id === productId);
+    if (!product) return;
+
+    // Initialize returnRequests if not exists
+    if (!product.returnRequests) {
+        product.returnRequests = [];
+    }
+
+    // Add return request
+    product.returnRequests.push({
+        role: currentUser.role,
+        comment: comment,
+        date: new Date().toISOString(),
+        status: 'pending'
+    });
+
+    saveData();
+    renderApprovalPanel(product);
+    showToast('Запрос на возврат отправлен продуктологу', 'success');
+}
+
+function returnToApproval(productId) {
+    if (!confirm('Вернуть документ на согласование? Все текущие согласования будут сброшены.')) {
+        return;
+    }
+
+    const product = AppState.products.find(p => p.id === productId);
+    if (!product) return;
+
+    // Reset all approvals
+    Object.keys(product.approvals || {}).forEach(role => {
+        product.approvals[role] = {
+            approved: false,
+            comment: '',
+            date: null
+        };
+    });
+
+    // Change status to approval
+    changeStatus(product, 'approval');
+
+    // Mark all return requests as processed
+    if (product.returnRequests) {
+        product.returnRequests.forEach(r => {
+            if (r.status === 'pending') {
+                r.status = 'processed';
+            }
+        });
+    }
+
+    saveData();
+    updateApprovalButton(product);
+    renderApprovalPanel(product);
+    showToast('Документ возвращён на согласование', 'success');
 }
 
 function updateApprovalButton(product) {
@@ -4517,6 +4630,8 @@ window.addFixedPremiumRow = addFixedPremiumRow;
 window.editProduct = editProduct;
 window.copyProduct = copyProduct;
 window.closeValidationModal = closeValidationModal;
+window.requestReturnToApproval = requestReturnToApproval;
+window.returnToApproval = returnToApproval;
 window.deleteProduct = deleteProduct;
 window.editPartner = editPartner;
 window.deletePartner = deletePartner;
