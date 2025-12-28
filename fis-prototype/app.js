@@ -309,8 +309,8 @@ function disableSectionFields(section, roleName) {
 const STATUS_TRANSITIONS = {
     'draft': ['approval'],
     'approval': ['approved', 'draft'],
-    'approved': ['approval', 'sent'],
-    'sent': []
+    'approved': ['approval', 'sent_to_cb'],
+    'sent_to_cb': []
 };
 
 function canTransitionTo(currentStatus, newStatus) {
@@ -819,7 +819,7 @@ function updateApprovalButton(product) {
         btn.textContent = 'Отправить в ЦБ';
         btn.disabled = false;
         btn.style.display = 'inline-block';
-    } else if (product.status === 'sent') {
+    } else if (product.status === 'sent_to_cb') {
         btn.textContent = 'Отправлено в ЦБ';
         btn.disabled = true;
         btn.style.display = 'inline-block';
@@ -848,8 +848,8 @@ function handleApprovalButtonClick() {
         updateApprovalButton(product);
     } else if (product.status === 'approved') {
         // Send to CB
-        if (changeStatus(product, 'sent')) {
-            saveProduct('sent');
+        if (changeStatus(product, 'sent_to_cb')) {
+            saveProduct('sent_to_cb');
             updateApprovalButton(product);
             renderApprovalPanel(product);
             showToast('Продукт отправлен в ЦБ', 'success');
@@ -1736,7 +1736,7 @@ function saveProduct(status) {
         'draft': 'Черновик сохранён',
         'approval': 'Отправлено на согласование',
         'approved': 'Согласовано',
-        'sent': 'Отправлено в ЦБ'
+        'sent_to_cb': 'Отправлено в ЦБ'
     };
 
     showToast(statusText[status] || 'Сохранено', 'success');
@@ -1878,7 +1878,7 @@ function collectFormData() {
 }
 
 function validateProduct() {
-    // Define ALL required fields for ALL roles
+    // Define ALL required fields for ALL roles (согласно ТЗ v3 раздел 6)
     const REQUIRED_FIELDS_BY_ROLE = {
         'Продуктолог': [
             { id: 'priority', label: 'Приоритет запуска' },
@@ -1886,17 +1886,22 @@ function validateProduct() {
             { id: 'marketing-name', label: 'Маркетинговое название' },
             { id: 'partner', label: 'Партнёр' },
             { id: 'segment', label: 'Сегмент' },
-            { id: 'product-group', label: 'Группа продукта' }
+            { id: 'product-group', label: 'Группа продукта' },
+            { id: 'product-code', label: 'Код продукта' },
+            { id: 'lk-card-type', label: 'Тип карточки в ЛК' },
+            { id: 'agency-code', label: 'Код Агентского договора (АД)' }
         ],
         'Андеррайтер': [
             { id: 'currency', label: 'Валюта договора', type: 'checkbox-group' },
-            { id: 'frequency', label: 'Периодичность оплаты', type: 'checkbox-group' }
+            { id: 'frequency', label: 'Периодичность оплаты', type: 'checkbox-group' },
+            { id: 'payment-frequencies', label: 'Доступная частота платежей', type: 'checkbox-group' }
         ],
         'Актуарий': [
             { id: 'llob', label: 'Линия бизнеса (LLOB)' }
         ],
         'Методолог': [
-            { id: 'contract-template', label: 'Шаблон договора', type: 'editor' }
+            { id: 'template-editor', label: 'Шаблон договора', type: 'editor' },
+            { id: 'insurance-rules', label: 'Правила страхования' }
         ]
     };
 
@@ -2017,7 +2022,7 @@ function updateMetrics() {
         draft: 0,
         approval: 0,
         approved: 0,
-        sent: 0
+        sent_to_cb: 0
     };
 
     AppState.products.forEach(product => {
@@ -2029,7 +2034,7 @@ function updateMetrics() {
     document.querySelectorAll('.metric-card').forEach(card => {
         const status = card.classList.contains('yellow') ? 'draft' :
                       card.classList.contains('orange') ? 'approval' :
-                      card.classList.contains('green') ? 'approved' : 'sent';
+                      card.classList.contains('green') ? 'approved' : 'sent_to_cb';
         card.querySelector('.metric-value').textContent = metrics[status];
     });
 }
@@ -2083,7 +2088,7 @@ function renderProductsList() {
     listContainer.innerHTML = filteredProducts.map(product => {
         const statusClass = product.status === 'draft' ? 'draft' :
                            product.status === 'approval' ? 'approval' :
-                           product.status === 'approved' ? 'approved' : 'sent';
+                           product.status === 'approved' ? 'approved' : 'sent_to_cb';
 
         const statusText = product.status === 'draft' ? 'Черновик 🟡' :
                           product.status === 'approval' ? 'Согласование 🟠' :
@@ -3259,7 +3264,7 @@ function calculateManagerMetrics() {
             // Use statusHistory to find when product reached final status
             if (p.statusHistory && p.statusHistory.length > 0) {
                 const created = new Date(p.createdAt);
-                const finalStatusEntry = p.statusHistory.find(h => h.status === 'sent' || h.status === 'Завершено');
+                const finalStatusEntry = p.statusHistory.find(h => h.status === 'sent_to_cb' || h.status === 'Завершено');
                 const finalDate = finalStatusEntry ? new Date(finalStatusEntry.date) : new Date(p.updatedAt);
                 const diffDays = Math.floor((finalDate - created) / (1000 * 60 * 60 * 24));
                 return diffDays;
@@ -4022,7 +4027,7 @@ function loadTestData() {
     // Продукт 6: Отправлено в ЦБ
     products.push({
         id: now - 500000,
-        status: 'sent',
+        status: 'sent_to_cb',
         createdAt: new Date(now - 86400000 * 30).toISOString(),
         updatedAt: new Date(now - 86400000 * 3).toISOString(),
         approvals: {
