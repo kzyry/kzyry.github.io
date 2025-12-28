@@ -820,6 +820,54 @@
                                 <label for="product-subtype">Подтип продукта</label>
                                 <input type="text" id="product-subtype" data-role-owner="Продуктолог" maxlength="50" placeholder="Облигации">
                             </div>
+
+                            <div class="form-group">
+                                <label for="software">ПО (программное обеспечение)</label>
+                                <select id="software" data-role-owner="Продуктолог">
+                                    <option value="">Выберите ПО</option>
+                                    <option value="AdInsure">AdInsure</option>
+                                    <option value="SAP ALICE">SAP ALICE</option>
+                                    <option value="Другое">Другое</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="contract-duration">Срок действия договора (лет)</label>
+                                <input type="number" id="contract-duration" data-role-owner="Продуктолог" min="1" max="99" placeholder="5">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="contract-effective-date">Дата вступления в силу (формула)</label>
+                                <input type="text" id="contract-effective-date" data-role-owner="Продуктолог" placeholder="Дата оформления (при условии оплаты)">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="payment-date-formula">Дата оплаты (формула)</label>
+                                <input type="text" id="payment-date-formula" data-role-owner="Продуктолог" placeholder="Дата оформления">
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label class="section-label">Способ оформления договора</label>
+                                <div class="checkbox-grid" data-role-owner="Продуктолог">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="paper-contract" data-role-owner="Продуктолог">
+                                        Бумажный договор
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="electronic-signature" data-role-owner="Продуктолог">
+                                        Электронное оформление (ПЭП)
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="electronic-offer" data-role-owner="Продуктолог">
+                                        Электронное оформление (оферта)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="insurance-rules">Правила страхования</label>
+                                <input type="text" id="insurance-rules" data-role-owner="Методолог" placeholder="№2 (в редакции от 01 апреля 2023 года)">
+                            </div>
                                 </div>
                             </section>
                         </div>
@@ -1199,7 +1247,271 @@
 
                         </div>
                     </div>
-                    <!-- Конец блока Андеррайтера -->
+                    <!-- Конец блока Андеррайтера (страховой взнос) -->
+
+                    <!-- Блок Андеррайтера (Андеррайтинг и Кумуляция) -->
+                    <div class="role-section" data-role="Андеррайтер">
+                        <div class="role-section-header">
+                            <div class="role-section-title">
+                                <span class="role-section-icon">🛡️</span>
+                                <span>Андеррайтинг и Кумуляция</span>
+                                <span class="role-section-badge">
+                                    <span class="status-icon">🔒</span>
+                                    <span class="status-text">Только просмотр</span>
+                                </span>
+                            </div>
+                            <div class="role-section-toggle">
+                                <span class="toggle-text">Свернуть</span>
+                                <span class="role-section-toggle-icon">▼</span>
+                            </div>
+                        </div>
+                        <div class="role-section-content">
+                            <section class="component-section">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="underwriting-required">Андеррайтинг</label>
+                                        <select id="underwriting-required" data-role-owner="Андеррайтер">
+                                            <option value="">Выберите</option>
+                                            <option value="Не предусмотрен">Не предусмотрен</option>
+                                            <option value="Предусмотрен">Предусмотрен</option>
+                                            <option value="По запросу">По запросу</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="manual-issue">Ручной выпуск договора</label>
+                                        <select id="manual-issue" data-role-owner="Андеррайтер">
+                                            <option value="">Выберите</option>
+                                            <option value="Не предусмотрен">Не предусмотрен</option>
+                                            <option value="Предусмотрен">Предусмотрен</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group full-width">
+                                        <label for="cumulation-description">Проверка кумуляции (описание)</label>
+                                        <textarea id="cumulation-description" data-role-owner="Андеррайтер" rows="3" placeholder="Проверка кумуляции: в рамках данного продукта и по всем заключенным договорам НСЖ, ИНСЖ в отношении Застрахованного..."></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Таблица лимитов кумуляции -->
+                                <div class="dynamic-table-section">
+                                    <h3>Лимиты кумуляции по рискам</h3>
+                                    <p class="help-text">Лимиты страховых сумм при превышении которых договор не выпускается</p>
+                                    <div class="table-container">
+                                        <table class="data-table" id="cumulation-limits-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Риск</th>
+                                                    <th>Лимит (₽)</th>
+                                                    <th>Действия</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><input type="text" placeholder="СЛП 18-70 лет" data-role-owner="Андеррайтер"></td>
+                                                    <td><input type="number" placeholder="15000000" min="0" data-role-owner="Андеррайтер"></td>
+                                                    <td><button type="button" class="btn-icon" onclick="deleteRow(this)">🗑️</button></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <button type="button" class="btn btn-secondary" id="add-cumulation-limit-row">+ Добавить лимит</button>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                    <!-- Конец блока Андеррайтера (Андеррайтинг и Кумуляция) -->
+
+                    <!-- Блок Андеррайтера (Идентификация) -->
+                    <div class="role-section" data-role="Андеррайтер">
+                        <div class="role-section-header">
+                            <div class="role-section-title">
+                                <span class="role-section-icon">🔖</span>
+                                <span>Идентификация продукта</span>
+                                <span class="role-section-badge">
+                                    <span class="status-icon">🔒</span>
+                                    <span class="status-text">Только просмотр</span>
+                                </span>
+                            </div>
+                            <div class="role-section-toggle">
+                                <span class="toggle-text">Свернуть</span>
+                                <span class="role-section-toggle-icon">▼</span>
+                            </div>
+                        </div>
+                        <div class="role-section-content">
+                            <section class="component-section">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="contract-number-format">Формат номера договора</label>
+                                        <input type="text" id="contract-number-format" data-role-owner="Андеррайтер" placeholder="438YY-ZZ000001">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="product-number-alice">Номер продукта в Alice</label>
+                                        <input type="text" id="product-number-alice" data-role-owner="Андеррайтер" placeholder="00792">
+                                    </div>
+                                </div>
+
+                                <!-- Таблица Каверов -->
+                                <div class="dynamic-table-section">
+                                    <h3>Каверы (риски)</h3>
+                                    <p class="help-text">Коды рисков в SAP и соответствующие каверы</p>
+                                    <div class="table-container">
+                                        <table class="data-table" id="covers-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Риск</th>
+                                                    <th>Код риска в САП</th>
+                                                    <th>LLOB</th>
+                                                    <th>Кавер</th>
+                                                    <th>Основание</th>
+                                                    <th>Обязательность</th>
+                                                    <th>Действия</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><input type="text" placeholder="Дожитие" data-role-owner="Андеррайтер"></td>
+                                                    <td><input type="text" placeholder="10029" data-role-owner="Андеррайтер"></td>
+                                                    <td><input type="text" placeholder="36404" data-role-owner="Андеррайтер"></td>
+                                                    <td><input type="text" placeholder="00501 Box Life – Дожитие" data-role-owner="Андеррайтер"></td>
+                                                    <td><input type="text" placeholder="300" data-role-owner="Андеррайтер"></td>
+                                                    <td>
+                                                        <select data-role-owner="Андеррайтер">
+                                                            <option value="Обязательный">Обязательный</option>
+                                                            <option value="Опциональный">Опциональный</option>
+                                                        </select>
+                                                    </td>
+                                                    <td><button type="button" class="btn-icon" onclick="deleteRow(this)">🗑️</button></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <button type="button" class="btn btn-secondary" id="add-cover-row">+ Добавить кавер</button>
+                                </div>
+
+                                <!-- Таблица Сервисов -->
+                                <div class="dynamic-table-section">
+                                    <h3>Сервисы</h3>
+                                    <p class="help-text">Дополнительные сервисы (налоговые, медицинские, юридические)</p>
+                                    <div class="table-container">
+                                        <table class="data-table" id="services-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Код сервиса</th>
+                                                    <th>Сервис</th>
+                                                    <th>Статус</th>
+                                                    <th>Код субтипа</th>
+                                                    <th>Субтип</th>
+                                                    <th>Тип</th>
+                                                    <th>Действия</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><input type="text" placeholder="TAX1" data-role-owner="Андеррайтер"></td>
+                                                    <td><input type="text" placeholder="Налоговый вычет" data-role-owner="Андеррайтер"></td>
+                                                    <td><input type="text" placeholder="Открыт с 01.06.2025" data-role-owner="Андеррайтер"></td>
+                                                    <td><input type="text" placeholder="2001" data-role-owner="Андеррайтер"></td>
+                                                    <td><input type="text" placeholder="Сервисы Налоговой Поддержки" data-role-owner="Андеррайтер"></td>
+                                                    <td>
+                                                        <select data-role-owner="Андеррайтер">
+                                                            <option value="TAX">TAX - Налоговые</option>
+                                                            <option value="MED">MED - Медицинские</option>
+                                                            <option value="LEG">LEG - Юридические</option>
+                                                        </select>
+                                                    </td>
+                                                    <td><button type="button" class="btn-icon" onclick="deleteRow(this)">🗑️</button></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <button type="button" class="btn btn-secondary" id="add-service-row">+ Добавить сервис</button>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                    <!-- Конец блока Андеррайтера (Идентификация) -->
+
+                    <!-- Блок Андеррайтера (Страховые риски и выплаты) -->
+                    <div class="role-section" data-role="Андеррайтер">
+                        <div class="role-section-header">
+                            <div class="role-section-title">
+                                <span class="role-section-icon">⚡</span>
+                                <span>Страховые риски и выплаты</span>
+                                <span class="role-section-badge">
+                                    <span class="status-icon">🔒</span>
+                                    <span class="status-text">Только просмотр</span>
+                                </span>
+                            </div>
+                            <div class="role-section-toggle">
+                                <span class="toggle-text">Свернуть</span>
+                                <span class="role-section-toggle-icon">▼</span>
+                            </div>
+                        </div>
+                        <div class="role-section-content">
+                            <section class="component-section">
+                                <!-- Таблица страховых рисков -->
+                                <div class="dynamic-table-section">
+                                    <h3>Страховые риски</h3>
+                                    <p class="help-text">Описание рисков, возраст застрахованного и условия покрытия</p>
+                                    <div class="table-container">
+                                        <table class="data-table" id="insurance-risks-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Риск</th>
+                                                    <th>Правило включения</th>
+                                                    <th>Возраст от (лет)</th>
+                                                    <th>Возраст до (лет)</th>
+                                                    <th>Действует до возраста</th>
+                                                    <th>Действия</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><input type="text" placeholder="Дожитие" data-role-owner="Андеррайтер"></td>
+                                                    <td><input type="text" placeholder="Обязательно включается" data-role-owner="Андеррайтер"></td>
+                                                    <td><input type="number" min="0" max="100" placeholder="18" data-role-owner="Андеррайтер"></td>
+                                                    <td><input type="number" min="0" max="100" placeholder="70" data-role-owner="Андеррайтер"></td>
+                                                    <td><input type="number" min="0" max="120" placeholder="75" data-role-owner="Андеррайтер"></td>
+                                                    <td><button type="button" class="btn-icon" onclick="deleteRow(this)">🗑️</button></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <button type="button" class="btn btn-secondary" id="add-risk-row">+ Добавить риск</button>
+                                </div>
+
+                                <!-- Таблица страховых сумм и выплат -->
+                                <div class="dynamic-table-section">
+                                    <h3>Страховые суммы и выплаты</h3>
+                                    <p class="help-text">Формулы расчета страховых сумм и условия выплат</p>
+                                    <div class="table-container">
+                                        <table class="data-table" id="insurance-payouts-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Наименование риска</th>
+                                                    <th>Страховая сумма (формула)</th>
+                                                    <th>Страховая выплата</th>
+                                                    <th>Действия</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><input type="text" placeholder="Дожитие" data-role-owner="Андеррайтер"></td>
+                                                    <td><input type="text" placeholder="СС = СП × срок + 35% кешбэк" data-role-owner="Андеррайтер"></td>
+                                                    <td><input type="text" placeholder="100% СС, единовременно" data-role-owner="Андеррайтер"></td>
+                                                    <td><button type="button" class="btn-icon" onclick="deleteRow(this)">🗑️</button></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <button type="button" class="btn btn-secondary" id="add-payout-row">+ Добавить выплату</button>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                    <!-- Конец блока Андеррайтера (Страховые риски) -->
 
                 </div>
 
@@ -1226,24 +1538,150 @@
 
                     <section class="component-section">
                         <h2 class="section-title">Редактор шаблона договора</h2>
+                        <!-- Блоки структурированных данных договора -->
+                        <section class="component-section">
+                            <h2 class="section-title">Блоки данных договора</h2>
+                            <p class="help-text">Заполните структурированные данные для автоподстановки в шаблон</p>
+
+                            <!-- Блок: Реквизиты договора -->
+                            <div class="contract-block">
+                                <h3>📄 Реквизиты договора</h3>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="template-contract-series">Серия договора</label>
+                                        <input type="text" id="template-contract-series" data-role-owner="Методолог" placeholder="438">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="template-contract-prefix">Префикс номера</label>
+                                        <input type="text" id="template-contract-prefix" data-role-owner="Методолог" placeholder="77">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Блок: Страхователь -->
+                            <div class="contract-block">
+                                <h3>👤 Страхователь (пример данных для предпросмотра)</h3>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="template-policyholder-lastname">Фамилия</label>
+                                        <input type="text" id="template-policyholder-lastname" data-role-owner="Методолог" placeholder="Иванов">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="template-policyholder-firstname">Имя</label>
+                                        <input type="text" id="template-policyholder-firstname" data-role-owner="Методолог" placeholder="Иван">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="template-policyholder-middlename">Отчество</label>
+                                        <input type="text" id="template-policyholder-middlename" data-role-owner="Методолог" placeholder="Иванович">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="template-policyholder-birthdate">Дата рождения</label>
+                                        <input type="date" id="template-policyholder-birthdate" data-role-owner="Методолог">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="template-policyholder-passport">Паспорт (серия и номер)</label>
+                                        <input type="text" id="template-policyholder-passport" data-role-owner="Методолог" placeholder="1234 567890">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="template-policyholder-phone">Телефон</label>
+                                        <input type="tel" id="template-policyholder-phone" data-role-owner="Методолог" placeholder="+7 (900) 123-45-67">
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="template-policyholder-address">Адрес регистрации</label>
+                                        <input type="text" id="template-policyholder-address" data-role-owner="Методолог" placeholder="г. Москва, ул. Ленина, д. 1, кв. 1">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Блок: Застрахованный -->
+                            <div class="contract-block">
+                                <h3>🛡️ Застрахованный (пример данных)</h3>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" id="template-insured-same" data-role-owner="Методолог">
+                                            Застрахованный совпадает со Страхователем
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-grid" id="insured-fields">
+                                    <div class="form-group">
+                                        <label for="template-insured-lastname">Фамилия</label>
+                                        <input type="text" id="template-insured-lastname" data-role-owner="Методолог" placeholder="Петров">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="template-insured-firstname">Имя</label>
+                                        <input type="text" id="template-insured-firstname" data-role-owner="Методолог" placeholder="Петр">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="template-insured-middlename">Отчество</label>
+                                        <input type="text" id="template-insured-middlename" data-role-owner="Методолог" placeholder="Петрович">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="template-insured-birthdate">Дата рождения</label>
+                                        <input type="date" id="template-insured-birthdate" data-role-owner="Методолог">
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
                         <div class="editor-toolbar">
-                            <button class="btn btn-secondary" id="preview-template-btn">👁 Предпросмотр</button>
+                            <button class="btn btn-secondary" id="preview-template-btn">👁 Предпросмотр с данными</button>
                             <button class="btn btn-secondary" id="export-html-btn">💾 Экспортировать HTML</button>
+                            <button class="btn btn-secondary" id="export-json-btn">📦 Экспортировать JSON</button>
                         </div>
                         <div class="editor-container">
                             <div class="fields-panel">
-                                <h3>Доступные поля</h3>
+                                <h3>Динамические поля</h3>
+                                <p class="help-text">Кликните на поле для вставки в договор</p>
+
                                 <div class="field-category">
-                                    <h4>Данные продукта</h4>
-                                    <div class="field-item" data-field="{{product.marketing_name}}">Маркетинговое название</div>
-                                    <div class="field-item" data-field="{{product.code}}">Код продукта</div>
-                                    <div class="field-item" data-field="{{product.partner}}">Партнёр</div>
-                                </div>
-                                <div class="field-category">
-                                    <h4>Реквизиты договора</h4>
+                                    <h4>📄 Реквизиты договора</h4>
                                     <div class="field-item" data-field="{{contract.number}}">Номер договора</div>
                                     <div class="field-item" data-field="{{contract.date}}">Дата заключения</div>
                                     <div class="field-item" data-field="{{contract.currency}}">Валюта</div>
+                                    <div class="field-item" data-field="{{contract.effective_date}}">Дата вступления в силу</div>
+                                    <div class="field-item" data-field="{{contract.duration}}">Срок действия договора</div>
+                                </div>
+
+                                <div class="field-category">
+                                    <h4>📦 Данные продукта</h4>
+                                    <div class="field-item" data-field="{{product.marketing_name}}">Маркетинговое название</div>
+                                    <div class="field-item" data-field="{{product.code}}">Код продукта</div>
+                                    <div class="field-item" data-field="{{product.partner}}">Партнёр</div>
+                                    <div class="field-item" data-field="{{product.group}}">Группа продукта</div>
+                                    <div class="field-item" data-field="{{product.rules}}">Правила страхования</div>
+                                </div>
+
+                                <div class="field-category">
+                                    <h4>👤 Страхователь</h4>
+                                    <div class="field-item" data-field="{{policyholder.full_name}}">ФИО</div>
+                                    <div class="field-item" data-field="{{policyholder.birthdate}}">Дата рождения</div>
+                                    <div class="field-item" data-field="{{policyholder.passport}}">Паспорт</div>
+                                    <div class="field-item" data-field="{{policyholder.address}}">Адрес регистрации</div>
+                                    <div class="field-item" data-field="{{policyholder.phone}}">Телефон</div>
+                                    <div class="field-item" data-field="{{policyholder.email}}">Email</div>
+                                </div>
+
+                                <div class="field-category">
+                                    <h4>🛡️ Застрахованный</h4>
+                                    <div class="field-item" data-field="{{insured.full_name}}">ФИО</div>
+                                    <div class="field-item" data-field="{{insured.birthdate}}">Дата рождения</div>
+                                    <div class="field-item" data-field="{{insured.passport}}">Паспорт</div>
+                                    <div class="field-item" data-field="{{insured.address}}">Адрес регистрации</div>
+                                </div>
+
+                                <div class="field-category">
+                                    <h4>💰 Страховые суммы</h4>
+                                    <div class="field-item" data-field="{{insurance.premium}}">Страховая премия</div>
+                                    <div class="field-item" data-field="{{insurance.sum}}">Страховая сумма</div>
+                                    <div class="field-item" data-field="{{insurance.payment_frequency}}">Периодичность оплаты</div>
+                                </div>
+
+                                <div class="field-category">
+                                    <h4>📅 Даты</h4>
+                                    <div class="field-item" data-field="{{today}}">Сегодня</div>
+                                    <div class="field-item" data-field="{{current.year}}">Текущий год</div>
                                 </div>
                             </div>
                             <div class="wysiwyg-editor" id="template-editor" contenteditable="true">

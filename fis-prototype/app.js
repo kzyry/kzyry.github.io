@@ -717,6 +717,42 @@ function initDynamicTables() {
     document.getElementById('add-kv-standard-row').addEventListener('click', () => {
         addKVRow('standard');
     });
+
+    // Add row buttons for new tables
+    const addCumulationBtn = document.getElementById('add-cumulation-limit-row');
+    if (addCumulationBtn) {
+        addCumulationBtn.addEventListener('click', () => {
+            addTableRow('cumulation-limits-table');
+        });
+    }
+
+    const addCoverBtn = document.getElementById('add-cover-row');
+    if (addCoverBtn) {
+        addCoverBtn.addEventListener('click', () => {
+            addTableRow('covers-table');
+        });
+    }
+
+    const addServiceBtn = document.getElementById('add-service-row');
+    if (addServiceBtn) {
+        addServiceBtn.addEventListener('click', () => {
+            addTableRow('services-table');
+        });
+    }
+
+    const addRiskBtn = document.getElementById('add-risk-row');
+    if (addRiskBtn) {
+        addRiskBtn.addEventListener('click', () => {
+            addTableRow('insurance-risks-table');
+        });
+    }
+
+    const addPayoutBtn = document.getElementById('add-payout-row');
+    if (addPayoutBtn) {
+        addPayoutBtn.addEventListener('click', () => {
+            addTableRow('insurance-payouts-table');
+        });
+    }
 }
 
 function generateMinPremiumTable() {
@@ -1126,6 +1162,14 @@ function initWYSIWYG() {
         exportHTML();
     });
 
+    // Export JSON button
+    const exportJsonBtn = document.getElementById('export-json-btn');
+    if (exportJsonBtn) {
+        exportJsonBtn.addEventListener('click', () => {
+            exportJSON();
+        });
+    }
+
     // Close modal
     document.querySelector('.close-modal').addEventListener('click', () => {
         document.getElementById('preview-modal').classList.remove('active');
@@ -1181,6 +1225,56 @@ function exportHTML() {
     URL.revokeObjectURL(url);
 
     showToast('HTML экспортирован', 'success');
+}
+
+function exportJSON() {
+    if (!AppState.currentProductId) {
+        showToast('Сначала откройте или создайте продукт', 'error');
+        return;
+    }
+
+    const product = AppState.products.find(p => p.id === AppState.currentProductId);
+    if (!product) {
+        showToast('Продукт не найден', 'error');
+        return;
+    }
+
+    // Collect all current form data
+    const currentData = collectFormData();
+    const editor = document.getElementById('template-editor');
+
+    // Create comprehensive export object
+    const exportData = {
+        meta: {
+            exportDate: new Date().toISOString(),
+            exportedBy: currentUser.name,
+            productId: product.id,
+            status: product.status,
+            version: '1.0'
+        },
+        product: {
+            ...product,
+            data: currentData,
+            contractTemplate: editor ? editor.innerHTML : ''
+        }
+    };
+
+    // Pretty-print JSON
+    const json = JSON.stringify(exportData, null, 2);
+
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+
+    // Generate filename from product name
+    const productName = currentData.marketingName || 'product';
+    const filename = `${productName.replace(/[^a-zA-Zа-яА-Я0-9]/g, '_')}_${Date.now()}.json`;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    showToast('JSON экспортирован', 'success');
 }
 
 // ========== PRODUCT MANAGEMENT ==========
@@ -1250,6 +1344,29 @@ function saveProduct(status) {
     updateAutosaveStatus('сохранено');
 }
 
+function collectTableData(tableId) {
+    const table = document.getElementById(tableId);
+    if (!table) return [];
+
+    const rows = table.querySelectorAll('tbody tr');
+    const data = [];
+
+    rows.forEach(row => {
+        const inputs = row.querySelectorAll('input, select');
+        const rowData = {};
+        inputs.forEach((input, index) => {
+            if (input.type === 'checkbox') {
+                rowData[`col${index}`] = input.checked;
+            } else {
+                rowData[`col${index}`] = input.value;
+            }
+        });
+        data.push(rowData);
+    });
+
+    return data;
+}
+
 function collectFormData() {
     return {
         priority: document.getElementById('priority').value,
@@ -1288,7 +1405,48 @@ function collectFormData() {
         disableRiskInsuranceSum: document.getElementById('disable-risk-insurance-sum').checked,
         useThreePayments: document.getElementById('use-three-payments').checked,
         freeOptionAvailable: document.getElementById('free-option-available').checked,
-        allowSumCalculation: document.getElementById('allow-sum-calculation').checked
+        allowSumCalculation: document.getElementById('allow-sum-calculation').checked,
+
+        // Параметры: дополнительные поля
+        software: document.getElementById('software').value,
+        contractDuration: document.getElementById('contract-duration').value,
+        contractEffectiveDate: document.getElementById('contract-effective-date').value,
+        paymentDateFormula: document.getElementById('payment-date-formula').value,
+        paperContract: document.getElementById('paper-contract').checked,
+        electronicSignature: document.getElementById('electronic-signature').checked,
+        insuranceRules: document.getElementById('insurance-rules').value,
+
+        // Андеррайтинг и Кумуляция
+        underwritingRequired: document.getElementById('underwriting-required').value,
+        manualIssue: document.getElementById('manual-issue').value,
+        cumulationDescription: document.getElementById('cumulation-description').value,
+        cumulationLimits: collectTableData('cumulation-limits-table'),
+
+        // Идентификация продукта
+        contractNumberFormat: document.getElementById('contract-number-format').value,
+        productNumberAlice: document.getElementById('product-number-alice').value,
+        covers: collectTableData('covers-table'),
+        services: collectTableData('services-table'),
+
+        // Страховые риски и выплаты
+        insuranceRisks: collectTableData('insurance-risks-table'),
+        insurancePayouts: collectTableData('insurance-payouts-table'),
+
+        // Блоки шаблона договора
+        templateContractNumber: document.getElementById('template-contract-number').value,
+        templateContractDate: document.getElementById('template-contract-date').value,
+        templatePolicyholderLastname: document.getElementById('template-policyholder-lastname').value,
+        templatePolicyholderFirstname: document.getElementById('template-policyholder-firstname').value,
+        templatePolicyholderMiddlename: document.getElementById('template-policyholder-middlename').value,
+        templatePolicyholderBirthdate: document.getElementById('template-policyholder-birthdate').value,
+        templatePolicyholderPassport: document.getElementById('template-policyholder-passport').value,
+        templatePolicyholderPhone: document.getElementById('template-policyholder-phone').value,
+        templatePolicyholderAddress: document.getElementById('template-policyholder-address').value,
+        templateInsuredLastname: document.getElementById('template-insured-lastname').value,
+        templateInsuredFirstname: document.getElementById('template-insured-firstname').value,
+        templateInsuredMiddlename: document.getElementById('template-insured-middlename').value,
+        templateInsuredBirthdate: document.getElementById('template-insured-birthdate').value,
+        sameAsPolicyholder: document.getElementById('same-as-policyholder').checked
     };
 }
 
@@ -1636,7 +1794,92 @@ function loadProductData(data) {
                 addKVRowWithData('assets', row);
             });
         }
+
+        // Load cumulation limits table
+        if (data.cumulationLimits) {
+            loadTableData('cumulation-limits-table', data.cumulationLimits);
+        }
+
+        // Load covers table
+        if (data.covers) {
+            loadTableData('covers-table', data.covers);
+        }
+
+        // Load services table
+        if (data.services) {
+            loadTableData('services-table', data.services);
+        }
+
+        // Load insurance risks table
+        if (data.insuranceRisks) {
+            loadTableData('insurance-risks-table', data.insuranceRisks);
+        }
+
+        // Load insurance payouts table
+        if (data.insurancePayouts) {
+            loadTableData('insurance-payouts-table', data.insurancePayouts);
+        }
     }, 100);
+}
+
+function loadTableData(tableId, data) {
+    const table = document.getElementById(tableId);
+    if (!table || !data || data.length === 0) return;
+
+    const tbody = table.querySelector('tbody');
+    if (!tbody) return;
+
+    // Keep first row as template, clear the rest
+    const firstRow = tbody.querySelector('tr');
+    tbody.innerHTML = '';
+    if (firstRow) tbody.appendChild(firstRow);
+
+    data.forEach((rowData, index) => {
+        let row;
+        if (index === 0 && firstRow) {
+            row = firstRow;
+        } else {
+            row = firstRow.cloneNode(true);
+            tbody.appendChild(row);
+        }
+
+        const inputs = row.querySelectorAll('input, select');
+        inputs.forEach((input, colIndex) => {
+            const value = rowData[`col${colIndex}`];
+            if (value !== undefined) {
+                if (input.type === 'checkbox') {
+                    input.checked = value;
+                } else {
+                    input.value = value;
+                }
+            }
+        });
+    });
+}
+
+function addTableRow(tableId) {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+
+    const tbody = table.querySelector('tbody');
+    if (!tbody) return;
+
+    const firstRow = tbody.querySelector('tr');
+    if (!firstRow) return;
+
+    // Clone the first row and clear its values
+    const newRow = firstRow.cloneNode(true);
+    const inputs = newRow.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        if (input.type === 'checkbox') {
+            input.checked = false;
+        } else {
+            input.value = '';
+        }
+    });
+
+    tbody.appendChild(newRow);
+    showToast('Строка добавлена', 'success');
 }
 
 function copyProduct(id) {
@@ -2822,7 +3065,56 @@ function loadTestData() {
             disableRiskInsuranceSum: false,
             useThreePayments: false,
             freeOptionAvailable: false,
-            allowSumCalculation: true
+            allowSumCalculation: true,
+            // Новые поля Параметров
+            software: 'AdInsure',
+            contractDuration: '10',
+            contractEffectiveDate: 'С даты подписания',
+            paymentDateFormula: '1 число месяца',
+            paperContract: true,
+            electronicSignature: true,
+            insuranceRules: 'Стандартные правила страхования жизни',
+            // Андеррайтинг и Кумуляция
+            underwritingRequired: 'Предусмотрен',
+            manualIssue: 'Оформление с согласования',
+            cumulationDescription: 'Кумуляция по основным рискам',
+            cumulationLimits: [
+                { col0: 'СЛП 18-70 лет', col1: '15000000' },
+                { col0: 'НС и Б 18-70 лет', col1: '10000000' }
+            ],
+            // Идентификация продукта
+            contractNumberFormat: 'PRD-{YYYY}-{NNNNN}',
+            productNumberAlice: 'ALICE-NSK-FUT-001',
+            covers: [
+                { col0: 'СЛП', col1: 'COVR-001', col2: 'LLOB-LIFE', col3: 'Cover-Life-Premium', col4: 'Договор', col5: 'Обязательный' }
+            ],
+            services: [
+                { col0: 'SRV-001', col1: 'Консультация врача', col2: 'Активен', col3: 'SUBTYPE-001', col4: 'Базовый', col5: 'Сервис' }
+            ],
+            // Страховые риски и выплаты
+            insuranceRisks: [
+                { col0: 'СЛП', col1: 'Автоматически', col2: '18', col3: '70', col4: '70' },
+                { col0: 'НС и Б', col1: 'По выбору', col2: '18', col3: '65', col4: '65' }
+            ],
+            insurancePayouts: [
+                { col0: 'СЛП', col1: '100% страховой суммы', col2: '100% страховой суммы' },
+                { col0: 'НС и Б', col1: 'По таблице выплат', col2: 'От 5% до 100%' }
+            ],
+            // Блоки шаблона договора
+            templateContractNumber: 'PRD-2025-00001',
+            templateContractDate: '2025-01-15',
+            templatePolicyholderLastname: 'Иванов',
+            templatePolicyholderFirstname: 'Иван',
+            templatePolicyholderMiddlename: 'Иванович',
+            templatePolicyholderBirthdate: '1985-05-20',
+            templatePolicyholderPassport: '4512 123456',
+            templatePolicyholderPhone: '+7 (999) 123-45-67',
+            templatePolicyholderAddress: 'г. Москва, ул. Тверская, д. 1, кв. 10',
+            templateInsuredLastname: 'Иванов',
+            templateInsuredFirstname: 'Иван',
+            templateInsuredMiddlename: 'Иванович',
+            templateInsuredBirthdate: '1985-05-20',
+            sameAsPolicyholder: true
         }
     });
 
