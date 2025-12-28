@@ -826,16 +826,37 @@ body {
 .field-item {
     padding: 8px 12px;
     background: var(--bg-primary);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 12px;
     margin-bottom: 4px;
     cursor: pointer;
     transition: var(--transition);
+    position: relative;
+    user-select: none;
+}
+
+.field-item::after {
+    content: '📋';
+    position: absolute;
+    right: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
 }
 
 .field-item:hover {
     background: var(--accent-blue);
     color: white;
+    border-color: var(--accent-blue);
+    transform: translateX(2px);
+}
+
+.field-item:hover::after {
+    opacity: 0.7;
+}
+
+.field-item:active {
+    transform: scale(0.98);
 }
 
 .wysiwyg-editor {

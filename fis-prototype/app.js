@@ -1540,23 +1540,75 @@ function previewTemplate() {
     const editor = document.getElementById('template-editor');
     let html = editor.innerHTML;
 
-    // Replace dynamic fields with test data
-    const testData = {
-        'product.marketing_name': 'Стратегия на пять. Гарант',
-        'product.code': 'IBGVTBROZ',
-        'product.partner': 'ВТБ Розница',
-        'contract.number': '000001',
-        'contract.date': '13.05.2024',
-        'contract.currency': 'RUB'
+    // Get actual data from form fields
+    const today = new Date();
+    const actualData = {
+        // Contract details
+        'contract.number': document.getElementById('template-contract-series')?.value || '438' + '-' +
+                           (document.getElementById('template-contract-prefix')?.value || '77') + '-000001',
+        'contract.date': today.toLocaleDateString('ru-RU'),
+        'contract.currency': getSelectedValuesText('input[name="currency"]') || 'RUB',
+        'contract.effective_date': today.toLocaleDateString('ru-RU'),
+        'contract.duration': document.getElementById('insurance-term')?.value || '10',
+
+        // Product data
+        'product.marketing_name': document.getElementById('marketing-name')?.value || 'Название продукта',
+        'product.code': document.getElementById('product-code')?.value || 'PRODUCTCODE',
+        'product.partner': document.getElementById('partner')?.value || 'Партнёр',
+        'product.group': document.getElementById('product-group')?.value || 'Группа продукта',
+        'product.rules': document.getElementById('insurance-rules')?.value || 'Правила страхования',
+
+        // Policyholder data
+        'policyholder.full_name': getFullName('policyholder'),
+        'policyholder.birthdate': document.getElementById('template-policyholder-birthdate')?.value || '01.01.1980',
+        'policyholder.passport': document.getElementById('template-policyholder-passport')?.value || '1234 567890',
+        'policyholder.address': document.getElementById('template-policyholder-address')?.value || 'Адрес',
+        'policyholder.phone': document.getElementById('template-policyholder-phone')?.value || '+7 (900) 123-45-67',
+        'policyholder.email': document.getElementById('template-policyholder-email')?.value || 'email@example.com',
+
+        // Insured data
+        'insured.full_name': getFullName('insured'),
+        'insured.birthdate': document.getElementById('template-insured-birthdate')?.value || '01.01.1980',
+        'insured.passport': document.getElementById('template-insured-lastname')?.value ? 'Данные паспорта' : '',
+        'insured.address': 'Адрес застрахованного',
+
+        // Insurance amounts
+        'insurance.premium': document.getElementById('insurance-premium')?.value || '0',
+        'insurance.sum': document.getElementById('insurance-sum')?.value || '0',
+        'insurance.payment_frequency': getSelectedValuesText('input[name="frequency"]') || 'Ежегодно',
+
+        // Dates
+        'today': today.toLocaleDateString('ru-RU'),
+        'current.year': today.getFullYear().toString()
     };
 
-    Object.keys(testData).forEach(key => {
+    // Replace all placeholders with actual data
+    Object.keys(actualData).forEach(key => {
         const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
-        html = html.replace(regex, testData[key]);
+        html = html.replace(regex, actualData[key]);
     });
 
     document.getElementById('preview-content').innerHTML = html;
     document.getElementById('preview-modal').classList.add('active');
+    showToast('Предпросмотр с актуальными данными', 'info');
+}
+
+// Helper function to get full name from template fields
+function getFullName(prefix) {
+    const lastname = document.getElementById(`template-${prefix}-lastname`)?.value || '';
+    const firstname = document.getElementById(`template-${prefix}-firstname`)?.value || '';
+    const middlename = document.getElementById(`template-${prefix}-middlename`)?.value || '';
+
+    return [lastname, firstname, middlename].filter(n => n).join(' ') || 'Не указано';
+}
+
+// Helper function to get selected checkbox/radio values as text
+function getSelectedValuesText(selector) {
+    const checkboxes = document.querySelectorAll(selector + ':checked');
+    return Array.from(checkboxes).map(cb => {
+        const label = cb.parentElement?.textContent?.trim() || cb.value;
+        return label;
+    }).join(', ');
 }
 
 function exportHTML() {
@@ -1816,7 +1868,12 @@ function collectFormData() {
         beneficiariesDeath: collectTableData('beneficiaries-death-table'),
 
         // Выкупные суммы
-        redemptionTable: collectTableData('redemption-table')
+        redemptionTable: collectTableData('redemption-table'),
+
+        // Contract template content
+        contractTemplate: document.getElementById('template-editor')?.innerHTML || '',
+        contractTemplateSeries: document.getElementById('template-contract-series')?.value || '',
+        contractTemplatePrefix: document.getElementById('template-contract-prefix')?.value || ''
     };
 }
 
@@ -2283,6 +2340,14 @@ function loadProductData(data) {
         // Load redemption table
         if (data.redemptionTable) {
             loadTableData('redemption-table', data.redemptionTable);
+        }
+
+        // Load contract template content
+        if (data.contractTemplate) {
+            const templateEditor = document.getElementById('template-editor');
+            if (templateEditor) {
+                templateEditor.innerHTML = data.contractTemplate;
+            }
         }
     }, 100);
 }
