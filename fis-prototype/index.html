@@ -41,6 +41,16 @@
                             <div class="role-name">Методолог</div>
                             <div class="role-description">Шаблон договора</div>
                         </div>
+                        <div class="role-option" data-role="Юрист">
+                            <div class="role-icon">⚖️</div>
+                            <div class="role-name">Юрист</div>
+                            <div class="role-description">Правовая экспертиза документов</div>
+                        </div>
+                        <div class="role-option" data-role="Финансист">
+                            <div class="role-icon">💰</div>
+                            <div class="role-name">Финансист</div>
+                            <div class="role-description">Финансовые модели и тарификация</div>
+                        </div>
                     </div>
                 </div>
                 <button class="btn btn-primary btn-block" id="login-btn" disabled>Войти в систему</button>
@@ -60,6 +70,9 @@
                 </a>
                 <a href="#" class="nav-item" data-page="archive">
                     <span class="icon">📁</span> Архив
+                </a>
+                <a href="#" class="nav-item" data-page="financial-models">
+                    <span class="icon">💰</span> Финансовые модели
                 </a>
                 <a href="#" class="nav-item" data-page="analytics">
                     <span class="icon">📈</span> Аналитика
@@ -205,6 +218,78 @@
                         <div class="empty-state">
                             <p>📁 Архив пуст. Здесь будут отображаться завершенные и отклоненные продукты.</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Models Page -->
+            <div id="financial-models-page" class="page">
+                <header class="page-header">
+                    <h1>Финансовые модели</h1>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" id="upload-config-btn">📤 Загрузить конфигурацию</button>
+                        <button class="btn btn-primary" id="export-models-btn">📥 Экспорт моделей</button>
+                    </div>
+                </header>
+
+                <!-- Стандартная лесенка КВ -->
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header">
+                        <h2>📊 Стандартная лесенка КВ (НСЖ без привязки к активам)</h2>
+                        <button class="btn btn-sm btn-primary" id="add-standard-kv-btn">+ Добавить запись</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="standard-kv-table">
+                            <thead>
+                                <tr>
+                                    <th>Код стратегии</th>
+                                    <th>Период действия</th>
+                                    <th>Срок (лет)</th>
+                                    <th>Валюта</th>
+                                    <th>Периодичность выплаты</th>
+                                    <th>Вариант ставки</th>
+                                    <th>Ставка ИСЖ (%)</th>
+                                    <th>Кешбек НСЖ (%)</th>
+                                    <th>РКО (%)</th>
+                                    <th>КУ (%)</th>
+                                    <th>КВ (%)</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="standard-kv-tbody">
+                                <!-- Данные будут загружены через JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Лесенка КВ с привязкой к активам -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>💎 Лесенка КВ с привязкой к активам (ИСЖ)</h2>
+                        <button class="btn btn-sm btn-primary" id="add-asset-kv-btn">+ Добавить запись</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="asset-kv-table">
+                            <thead>
+                                <tr>
+                                    <th>Срок (лет)</th>
+                                    <th>ID / ISIN</th>
+                                    <th>КВ (%)</th>
+                                    <th>ИЧ (%)</th>
+                                    <th>MF (%)</th>
+                                    <th>Расходы открытие (%)</th>
+                                    <th>Комиссия вывод (%)</th>
+                                    <th>РКО (%)</th>
+                                    <th>Стандартные условия</th>
+                                    <th>Согласование УД</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="asset-kv-tbody">
+                                <!-- Данные будут загружены через JS -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -680,6 +765,7 @@
                 <div class="tabs">
                     <button class="tab-btn active" data-tab="business-context">Бизнес-контекст продукта</button>
                     <button class="tab-btn" data-tab="contract-template">Шаблон договора</button>
+                    <button class="tab-btn" data-tab="redemption-calculator">Калькулятор выкупных сумм</button>
                 </div>
 
                 <!-- Вкладка: Бизнес-контекст продукта -->
@@ -1828,6 +1914,75 @@
                     <!-- Конец блока Методолога -->
 
                 </div>
+
+                <!-- Вкладка: Калькулятор выкупных сумм -->
+                <div id="redemption-calculator-tab" class="tab-content">
+                    <div class="role-section" data-role="Актуарий">
+                        <div class="role-section-header">
+                            <div class="role-section-title">
+                                <span class="role-section-icon">📈</span>
+                                <span>Калькулятор выкупных сумм</span>
+                                <span class="role-section-badge">
+                                    <span class="status-icon">ℹ️</span>
+                                    <span class="status-text">Автоматический расчет</span>
+                                </span>
+                            </div>
+                            <div class="role-section-toggle">
+                                <span class="toggle-text">Свернуть</span>
+                                <span class="role-section-toggle-icon">▼</span>
+                            </div>
+                        </div>
+                        <div class="role-section-content">
+                            <section class="component-section">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="redemption-term">Срок страхования (лет) *</label>
+                                        <input type="number" id="redemption-term" min="1" max="30" value="10" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="redemption-sum">Страховая сумма *</label>
+                                        <input type="number" id="redemption-sum" min="0" step="1000" value="100000" required>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <button class="btn btn-primary" id="calculate-redemption-btn">Рассчитать выкупные суммы</button>
+                                    </div>
+                                </div>
+
+                                <div class="card" style="margin-top: 24px;">
+                                    <div class="card-header">
+                                        <h3>Таблица выкупных сумм</h3>
+                                    </div>
+                                    <div class="table-container">
+                                        <table class="data-table" id="redemption-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Год полиса</th>
+                                                    <th>Процент выкупа (%)</th>
+                                                    <th>Выкупная сумма (₽)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="redemption-tbody">
+                                                <tr>
+                                                    <td colspan="3" style="text-align: center; padding: 24px;">
+                                                        Нажмите "Рассчитать выкупные суммы" для генерации таблицы
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="help-box" style="margin-top: 16px;">
+                                    <strong>ℹ️ Формула расчета:</strong>
+                                    <p>Процент выкупа = (Год полиса / Срок страхования) × 100%</p>
+                                    <p>Выкупная сумма = Страховая сумма × (Процент выкупа / 100)</p>
+                                    <p><em>Пример:</em> Для срока 10 лет на 5-й год: выкуп = 5/10 × 100% = 50%</p>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -1840,6 +1995,171 @@
                 <button class="close-modal">&times;</button>
             </div>
             <div class="modal-body" id="preview-content"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно загрузки конфигурации -->
+    <div id="upload-config-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Загрузить конфигурацию финансовых моделей</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Загрузите JSON файл с настройками лесенок КВ</p>
+                <input type="file" id="config-file-input" accept=".json,.csv" style="margin: 16px 0;">
+                <div class="form-actions" style="margin-top: 24px;">
+                    <button class="btn btn-secondary close-modal">Отмена</button>
+                    <button class="btn btn-primary" id="import-config-btn">Импортировать</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно добавления стандартной записи КВ -->
+    <div id="add-standard-kv-modal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2>Добавить запись в стандартную лесенку КВ</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="standard-kv-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Код стратегии</label>
+                            <input type="text" id="std-strategy-code" maxlength="20" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Период действия</label>
+                            <input type="text" id="std-period" placeholder="ДД.ММ.ГГГГ — ДД.ММ.ГГГГ" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Срок страхования (лет)</label>
+                            <input type="number" id="std-term" min="1" max="30" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Валюта договора</label>
+                            <select id="std-currency" required>
+                                <option value="">Выберите валюту</option>
+                                <option value="RUB">RUB</option>
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Периодичность выплаты</label>
+                            <input type="text" id="std-frequency" maxlength="50">
+                        </div>
+                        <div class="form-group">
+                            <label>Вариант ставки</label>
+                            <input type="text" id="std-rate-variant" maxlength="50">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ставка ИСЖ (%)</label>
+                            <input type="number" id="std-isj-rate" step="0.01" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label>Кешбек НСЖ (%)</label>
+                            <input type="number" id="std-nsj-cashback" step="0.01" min="0" max="100">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>РКО (%)</label>
+                            <input type="number" id="std-rko" step="0.001" min="0" max="5">
+                        </div>
+                        <div class="form-group">
+                            <label>КУ (%)</label>
+                            <input type="number" id="std-ku" step="0.01" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label>КВ (%)</label>
+                            <input type="number" id="std-kv" step="0.01" min="0" max="100" required>
+                        </div>
+                    </div>
+                    <div class="form-actions" style="margin-top: 24px;">
+                        <button type="button" class="btn btn-secondary close-modal">Отмена</button>
+                        <button type="submit" class="btn btn-primary">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно добавления записи КВ с активами -->
+    <div id="add-asset-kv-modal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2>Добавить запись в лесенку КВ с активами</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="asset-kv-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Срок страхования (лет)</label>
+                            <input type="number" id="asset-term" min="1" max="30" required>
+                        </div>
+                        <div class="form-group">
+                            <label>ID / ISIN</label>
+                            <input type="text" id="asset-isin" placeholder="RU000A103X66 или 12345" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>КВ (%)</label>
+                            <input type="number" id="asset-kv" step="0.01" min="0" max="100" required>
+                        </div>
+                        <div class="form-group">
+                            <label>ИЧ (%)</label>
+                            <input type="number" id="asset-ich" step="0.01" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label>MF (%)</label>
+                            <input type="number" id="asset-mf" step="0.01" min="0" max="10">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Расходы открытие (%)</label>
+                            <input type="number" id="asset-opening" step="0.01" min="0" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Комиссия вывод (%)</label>
+                            <input type="number" id="asset-withdrawal" step="0.01" min="0" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label>РКО (%)</label>
+                            <input type="number" id="asset-rko" step="0.001" min="0" max="5">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="asset-standard">
+                                Стандартные условия
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="asset-ud">
+                                Требуется согласование УД
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-actions" style="margin-top: 24px;">
+                        <button type="button" class="btn btn-secondary close-modal">Отмена</button>
+                        <button type="submit" class="btn btn-primary">Добавить</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 

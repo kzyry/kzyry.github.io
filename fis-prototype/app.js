@@ -1,7 +1,7 @@
 // ========== STATE MANAGEMENT ==========
 let currentUser = {
     name: '',
-    role: '', // 'Продуктолог' | 'Андеррайтер' | 'Актуарий' | 'Методолог'
+    role: '', // 'Продуктолог' | 'Андеррайтер' | 'Актуарий' | 'Методолог' | 'Юрист' | 'Финансист'
     canEdit: function(fieldOwner) {
         return this.role === fieldOwner;
     }
@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function initApp() {
     loadProducts();
     loadAuditLog(); // Block 5.1: Load audit log from localStorage
+    initFinancialModels(); // Initialize financial models data
     initNavigation();
     initTabs();
     initFormHandlers();
@@ -45,6 +46,8 @@ function initApp() {
     initWYSIWYG();
     initRoleSections(); // Initialize role-based sections
     initFilters(); // Initialize product filters
+    initFinancialModelsHandlers(); // Initialize financial models handlers
+    initRedemptionCalculator(); // Initialize redemption calculator
     renderDashboard();
     updateUserProfile();
     applyRoleBasedAccess();
@@ -347,7 +350,9 @@ function approveByRole(product, role, comment = '') {
             'Продуктолог': { approved: false, comment: '', date: null },
             'Андеррайтер': { approved: false, comment: '', date: null },
             'Актуарий': { approved: false, comment: '', date: null },
-            'Методолог': { approved: false, comment: '', date: null }
+            'Методолог': { approved: false, comment: '', date: null },
+            'Юрист': { approved: false, comment: '', date: null },
+            'Финансист': { approved: false, comment: '', date: null }
         };
     }
 
@@ -541,6 +546,10 @@ function initNavigation() {
             } else if (page === 'archive') {
                 switchPage('archive');
                 renderArchivePage();
+            } else if (page === 'financial-models') {
+                switchPage('financial-models');
+                renderStandardKVTable();
+                renderAssetKVTable();
             } else if (page === 'settings') {
                 switchPage('settings');
                 renderSettingsPage();
@@ -3024,7 +3033,9 @@ function loadTestData() {
             'Продуктолог': { approved: false, comment: '', date: null },
             'Андеррайтер': { approved: false, comment: '', date: null },
             'Актуарий': { approved: false, comment: '', date: null },
-            'Методолог': { approved: false, comment: '', date: null }
+            'Методолог': { approved: false, comment: '', date: null },
+            'Юрист': { approved: false, comment: '', date: null },
+            'Финансист': { approved: false, comment: '', date: null }
         },
         data: {
             priority: 'Высокий',
@@ -3075,7 +3086,9 @@ function loadTestData() {
             'Продуктолог': { approved: false, comment: '', date: null },
             'Андеррайтер': { approved: false, comment: '', date: null },
             'Актуарий': { approved: false, comment: '', date: null },
-            'Методолог': { approved: false, comment: '', date: null }
+            'Методолог': { approved: false, comment: '', date: null },
+            'Юрист': { approved: false, comment: '', date: null },
+            'Финансист': { approved: false, comment: '', date: null }
         },
         data: {
             priority: 'Средний',
@@ -3203,7 +3216,9 @@ function loadTestData() {
             'Продуктолог': { approved: true, comment: 'Согласовано. Продукт актуален для рынка.', date: new Date(now - 86400000 * 8).toISOString() },
             'Андеррайтер': { approved: true, comment: 'Риски оценены, параметры корректны.', date: new Date(now - 86400000 * 6).toISOString() },
             'Актуарий': { approved: false, comment: '', date: null },
-            'Методолог': { approved: false, comment: '', date: null }
+            'Методолог': { approved: false, comment: '', date: null },
+            'Юрист': { approved: false, comment: '', date: null },
+            'Финансист': { approved: false, comment: '', date: null }
         },
         data: {
             priority: 'Высокий',
@@ -3254,7 +3269,9 @@ function loadTestData() {
             'Продуктолог': { approved: true, comment: 'Автоматическое согласование при отправке', date: new Date(now - 86400000 * 4).toISOString() },
             'Андеррайтер': { approved: false, comment: '', date: null },
             'Актуарий': { approved: false, comment: '', date: null },
-            'Методолог': { approved: false, comment: '', date: null }
+            'Методолог': { approved: false, comment: '', date: null },
+            'Юрист': { approved: false, comment: '', date: null },
+            'Финансист': { approved: false, comment: '', date: null }
         },
         data: {
             priority: 'Низкий',
@@ -3305,7 +3322,9 @@ function loadTestData() {
             'Продуктолог': { approved: true, comment: 'Продукт соответствует стратегии компании.', date: new Date(now - 86400000 * 12).toISOString() },
             'Андеррайтер': { approved: true, comment: 'Андеррайтинговые правила утверждены.', date: new Date(now - 86400000 * 10).toISOString() },
             'Актуарий': { approved: true, comment: 'Тарифы рассчитаны и проверены.', date: new Date(now - 86400000 * 5).toISOString() },
-            'Методолог': { approved: true, comment: 'Документация подготовлена в полном объеме.', date: new Date(now - 86400000 * 1).toISOString() }
+            'Методолог': { approved: true, comment: 'Документация подготовлена в полном объеме.', date: new Date(now - 86400000 * 1).toISOString() },
+            'Юрист': { approved: true, comment: 'Правовая экспертиза завершена.', date: new Date(now - 86400000 * 3).toISOString() },
+            'Финансист': { approved: true, comment: 'Финансовая модель утверждена.', date: new Date(now - 86400000 * 7).toISOString() }
         },
         data: {
             priority: 'Высокий',
@@ -3356,7 +3375,9 @@ function loadTestData() {
             'Продуктолог': { approved: true, comment: 'Согласовано.', date: new Date(now - 86400000 * 25).toISOString() },
             'Андеррайтер': { approved: true, comment: 'Согласовано.', date: new Date(now - 86400000 * 23).toISOString() },
             'Актуарий': { approved: true, comment: 'Согласовано.', date: new Date(now - 86400000 * 20).toISOString() },
-            'Методолог': { approved: true, comment: 'Согласовано.', date: new Date(now - 86400000 * 18).toISOString() }
+            'Методолог': { approved: true, comment: 'Согласовано.', date: new Date(now - 86400000 * 18).toISOString() },
+            'Юрист': { approved: true, comment: 'Согласовано.', date: new Date(now - 86400000 * 22).toISOString() },
+            'Финансист': { approved: true, comment: 'Согласовано.', date: new Date(now - 86400000 * 24).toISOString() }
         },
         data: {
             priority: 'Высокий',
@@ -3407,7 +3428,9 @@ function loadTestData() {
             'Продуктолог': { approved: true, comment: 'Продукт востребован на рынке.', date: new Date(now - 86400000 * 10).toISOString() },
             'Андеррайтер': { approved: true, comment: 'Риски приемлемы.', date: new Date(now - 86400000 * 8).toISOString() },
             'Актуарий': { approved: true, comment: 'Тарификация выполнена корректно.', date: new Date(now - 86400000 * 5).toISOString() },
-            'Методолог': { approved: false, comment: '', date: null }
+            'Методолог': { approved: false, comment: '', date: null },
+            'Юрист': { approved: false, comment: '', date: null },
+            'Финансист': { approved: true, comment: 'Финансовая модель проверена.', date: new Date(now - 86400000 * 6).toISOString() }
         },
         data: {
             priority: 'Средний',
@@ -3458,7 +3481,9 @@ function loadTestData() {
             'Продуктолог': { approved: false, comment: '', date: null },
             'Андеррайтер': { approved: false, comment: '', date: null },
             'Актуарий': { approved: false, comment: '', date: null },
-            'Методолог': { approved: false, comment: '', date: null }
+            'Методолог': { approved: false, comment: '', date: null },
+            'Юрист': { approved: false, comment: '', date: null },
+            'Финансист': { approved: false, comment: '', date: null }
         },
         data: {
             priority: 'Средний',
@@ -3604,6 +3629,439 @@ function loadTestData() {
     return products;
 }
 
+// ========== FINANCIAL MODELS MANAGEMENT ==========
+
+// Инициализация данных финансовых моделей
+function initFinancialModels() {
+    const standardKV = localStorage.getItem('standardKV');
+    const assetKV = localStorage.getItem('assetKV');
+
+    if (!standardKV) {
+        // Тестовые данные для стандартной лесенки КВ
+        const defaultStandardKV = [
+            {
+                id: Date.now() + 1,
+                strategyCode: 'STD_BASE',
+                period: '01.01.2024 — 31.12.2024',
+                term: 5,
+                currency: 'RUB',
+                frequency: 'В конце срока',
+                rateVariant: 'Базовая',
+                isjRate: 7.50,
+                nsjCashback: 40.00,
+                rko: 0.027,
+                ku: 100.00,
+                kv: 10.00
+            },
+            {
+                id: Date.now() + 2,
+                strategyCode: 'CONSERVATIVE',
+                period: '01.01.2024 — бессрочно',
+                term: 10,
+                currency: 'RUB',
+                frequency: 'Ежегодно',
+                rateVariant: 'Повышенная',
+                isjRate: 5.00,
+                nsjCashback: 35.00,
+                rko: 0.027,
+                ku: 80.00,
+                kv: 8.00
+            }
+        ];
+        localStorage.setItem('standardKV', JSON.stringify(defaultStandardKV));
+    }
+
+    if (!assetKV) {
+        // Тестовые данные для лесенки КВ с активами
+        const defaultAssetKV = [
+            {
+                id: Date.now() + 10,
+                term: 5,
+                isin: 'RU000A103X66',
+                kv: 4.00,
+                ich: 91.00,
+                mf: 0.50,
+                opening: 0.10,
+                withdrawal: 1.00,
+                rko: 0.027,
+                standard: true,
+                udApproval: false
+            },
+            {
+                id: Date.now() + 11,
+                term: 10,
+                isin: 'RU000A0JX0J2',
+                kv: 2.50,
+                ich: 85.00,
+                mf: 1.00,
+                opening: 0.50,
+                withdrawal: 2.00,
+                rko: 0.027,
+                standard: false,
+                udApproval: true
+            }
+        ];
+        localStorage.setItem('assetKV', JSON.stringify(defaultAssetKV));
+    }
+}
+
+// Загрузка данных из localStorage
+function loadStandardKV() {
+    const data = localStorage.getItem('standardKV');
+    return data ? JSON.parse(data) : [];
+}
+
+function loadAssetKV() {
+    const data = localStorage.getItem('assetKV');
+    return data ? JSON.parse(data) : [];
+}
+
+// Сохранение данных в localStorage
+function saveStandardKV(data) {
+    localStorage.setItem('standardKV', JSON.stringify(data));
+}
+
+function saveAssetKV(data) {
+    localStorage.setItem('assetKV', JSON.stringify(data));
+}
+
+// Отрисовка таблицы стандартной лесенки КВ
+function renderStandardKVTable() {
+    const tbody = document.getElementById('standard-kv-tbody');
+    if (!tbody) return;
+
+    const data = loadStandardKV();
+    tbody.innerHTML = '';
+
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; padding: 24px;">Нет данных. Добавьте первую запись.</td></tr>';
+        return;
+    }
+
+    data.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.strategyCode || '-'}</td>
+            <td>${item.period || '-'}</td>
+            <td>${item.term || '-'}</td>
+            <td>${item.currency || '-'}</td>
+            <td>${item.frequency || '-'}</td>
+            <td>${item.rateVariant || '-'}</td>
+            <td>${item.isjRate != null ? item.isjRate.toFixed(2) : '-'}</td>
+            <td>${item.nsjCashback != null ? item.nsjCashback.toFixed(2) : '-'}</td>
+            <td>${item.rko != null ? item.rko.toFixed(3) : '-'}</td>
+            <td>${item.ku != null ? item.ku.toFixed(2) : '-'}</td>
+            <td>${item.kv != null ? item.kv.toFixed(2) : '-'}</td>
+            <td>
+                <button class="btn btn-sm btn-danger" onclick="deleteStandardKV(${item.id})">Удалить</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Отрисовка таблицы лесенки КВ с активами
+function renderAssetKVTable() {
+    const tbody = document.getElementById('asset-kv-tbody');
+    if (!tbody) return;
+
+    const data = loadAssetKV();
+    tbody.innerHTML = '';
+
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 24px;">Нет данных. Добавьте первую запись.</td></tr>';
+        return;
+    }
+
+    data.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.term || '-'}</td>
+            <td>${item.isin || '-'}</td>
+            <td>${item.kv != null ? item.kv.toFixed(2) : '-'}</td>
+            <td>${item.ich != null ? item.ich.toFixed(2) : '-'}</td>
+            <td>${item.mf != null ? item.mf.toFixed(2) : '-'}</td>
+            <td>${item.opening != null ? item.opening.toFixed(2) : '-'}</td>
+            <td>${item.withdrawal != null ? item.withdrawal.toFixed(2) : '-'}</td>
+            <td>${item.rko != null ? item.rko.toFixed(3) : '-'}</td>
+            <td>${item.standard ? 'Да' : 'Нет'}</td>
+            <td>${item.udApproval ? 'Да' : 'Нет'}</td>
+            <td>
+                <button class="btn btn-sm btn-danger" onclick="deleteAssetKV(${item.id})">Удалить</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Добавление записи в стандартную лесенку КВ
+function addStandardKV(formData) {
+    const data = loadStandardKV();
+    const newItem = {
+        id: Date.now(),
+        strategyCode: formData.strategyCode,
+        period: formData.period,
+        term: parseInt(formData.term),
+        currency: formData.currency,
+        frequency: formData.frequency || '',
+        rateVariant: formData.rateVariant || '',
+        isjRate: parseFloat(formData.isjRate) || 0,
+        nsjCashback: parseFloat(formData.nsjCashback) || 0,
+        rko: parseFloat(formData.rko) || 0,
+        ku: parseFloat(formData.ku) || 0,
+        kv: parseFloat(formData.kv)
+    };
+    data.push(newItem);
+    saveStandardKV(data);
+    renderStandardKVTable();
+    showToast('Запись добавлена в стандартную лесенку КВ');
+}
+
+// Добавление записи в лесенку КВ с активами
+function addAssetKV(formData) {
+    const data = loadAssetKV();
+    const newItem = {
+        id: Date.now(),
+        term: parseInt(formData.term),
+        isin: formData.isin,
+        kv: parseFloat(formData.kv),
+        ich: parseFloat(formData.ich) || 0,
+        mf: parseFloat(formData.mf) || 0,
+        opening: parseFloat(formData.opening) || 0,
+        withdrawal: parseFloat(formData.withdrawal) || 0,
+        rko: parseFloat(formData.rko) || 0,
+        standard: formData.standard || false,
+        udApproval: formData.udApproval || false
+    };
+    data.push(newItem);
+    saveAssetKV(data);
+    renderAssetKVTable();
+    showToast('Запись добавлена в лесенку КВ с активами');
+}
+
+// Удаление записи из стандартной лесенки КВ
+function deleteStandardKV(id) {
+    const data = loadStandardKV();
+    const filtered = data.filter(item => item.id !== id);
+    saveStandardKV(filtered);
+    renderStandardKVTable();
+    showToast('Запись удалена');
+}
+
+// Удаление записи из лесенки КВ с активами
+function deleteAssetKV(id) {
+    const data = loadAssetKV();
+    const filtered = data.filter(item => item.id !== id);
+    saveAssetKV(filtered);
+    renderAssetKVTable();
+    showToast('Запись удалена');
+}
+
+// Экспорт данных финансовых моделей
+function exportFinancialModels() {
+    const data = {
+        standardKV: loadStandardKV(),
+        assetKV: loadAssetKV(),
+        exportDate: new Date().toISOString()
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `financial-models-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast('Финансовые модели экспортированы');
+}
+
+// Импорт данных финансовых моделей
+function importFinancialModels(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+
+            if (data.standardKV && Array.isArray(data.standardKV)) {
+                saveStandardKV(data.standardKV);
+                renderStandardKVTable();
+            }
+
+            if (data.assetKV && Array.isArray(data.assetKV)) {
+                saveAssetKV(data.assetKV);
+                renderAssetKVTable();
+            }
+
+            showToast('Конфигурация успешно импортирована');
+            closeModal('upload-config-modal');
+        } catch (error) {
+            showToast('Ошибка импорта: неверный формат файла', 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+// Инициализация обработчиков финансовых моделей
+function initFinancialModelsHandlers() {
+    // Кнопка загрузки конфигурации
+    const uploadBtn = document.getElementById('upload-config-btn');
+    if (uploadBtn) {
+        uploadBtn.addEventListener('click', () => openModal('upload-config-modal'));
+    }
+
+    // Кнопка экспорта моделей
+    const exportBtn = document.getElementById('export-models-btn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', exportFinancialModels);
+    }
+
+    // Кнопка добавления стандартной записи КВ
+    const addStdBtn = document.getElementById('add-standard-kv-btn');
+    if (addStdBtn) {
+        addStdBtn.addEventListener('click', () => openModal('add-standard-kv-modal'));
+    }
+
+    // Кнопка добавления записи КВ с активами
+    const addAssetBtn = document.getElementById('add-asset-kv-btn');
+    if (addAssetBtn) {
+        addAssetBtn.addEventListener('click', () => openModal('add-asset-kv-modal'));
+    }
+
+    // Кнопка импорта конфигурации
+    const importBtn = document.getElementById('import-config-btn');
+    if (importBtn) {
+        importBtn.addEventListener('click', () => {
+            const fileInput = document.getElementById('config-file-input');
+            if (fileInput && fileInput.files.length > 0) {
+                importFinancialModels(fileInput.files[0]);
+            } else {
+                showToast('Выберите файл для импорта', 'error');
+            }
+        });
+    }
+
+    // Форма добавления стандартной записи КВ
+    const stdForm = document.getElementById('standard-kv-form');
+    if (stdForm) {
+        stdForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = {
+                strategyCode: document.getElementById('std-strategy-code').value,
+                period: document.getElementById('std-period').value,
+                term: document.getElementById('std-term').value,
+                currency: document.getElementById('std-currency').value,
+                frequency: document.getElementById('std-frequency').value,
+                rateVariant: document.getElementById('std-rate-variant').value,
+                isjRate: document.getElementById('std-isj-rate').value,
+                nsjCashback: document.getElementById('std-nsj-cashback').value,
+                rko: document.getElementById('std-rko').value,
+                ku: document.getElementById('std-ku').value,
+                kv: document.getElementById('std-kv').value
+            };
+            addStandardKV(formData);
+            closeModal('add-standard-kv-modal');
+            stdForm.reset();
+        });
+    }
+
+    // Форма добавления записи КВ с активами
+    const assetForm = document.getElementById('asset-kv-form');
+    if (assetForm) {
+        assetForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = {
+                term: document.getElementById('asset-term').value,
+                isin: document.getElementById('asset-isin').value,
+                kv: document.getElementById('asset-kv').value,
+                ich: document.getElementById('asset-ich').value,
+                mf: document.getElementById('asset-mf').value,
+                opening: document.getElementById('asset-opening').value,
+                withdrawal: document.getElementById('asset-withdrawal').value,
+                rko: document.getElementById('asset-rko').value,
+                standard: document.getElementById('asset-standard').checked,
+                udApproval: document.getElementById('asset-ud').checked
+            };
+            addAssetKV(formData);
+            closeModal('add-asset-kv-modal');
+            assetForm.reset();
+        });
+    }
+}
+
+// ========== REDEMPTION CALCULATOR ==========
+
+// Расчет выкупных сумм
+function calculateRedemption() {
+    const termInput = document.getElementById('redemption-term');
+    const sumInput = document.getElementById('redemption-sum');
+    const tbody = document.getElementById('redemption-tbody');
+
+    if (!termInput || !sumInput || !tbody) return;
+
+    const term = parseInt(termInput.value);
+    const insuranceSum = parseFloat(sumInput.value);
+
+    if (!term || term < 1 || term > 30) {
+        showToast('Укажите срок страхования от 1 до 30 лет', 'error');
+        return;
+    }
+
+    if (!insuranceSum || insuranceSum <= 0) {
+        showToast('Укажите страховую сумму больше 0', 'error');
+        return;
+    }
+
+    // Очистить таблицу
+    tbody.innerHTML = '';
+
+    // Генерация таблицы выкупных сумм
+    for (let year = 1; year <= term; year++) {
+        const redemptionPercent = (year / term) * 100;
+        const redemptionSum = insuranceSum * (redemptionPercent / 100);
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${year}</td>
+            <td>${redemptionPercent.toFixed(2)}%</td>
+            <td>${redemptionSum.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽</td>
+        `;
+        tbody.appendChild(row);
+    }
+
+    showToast('Выкупные суммы рассчитаны');
+}
+
+// Инициализация обработчиков калькулятора выкупных сумм
+function initRedemptionCalculator() {
+    const calculateBtn = document.getElementById('calculate-redemption-btn');
+    if (calculateBtn) {
+        calculateBtn.addEventListener('click', calculateRedemption);
+    }
+
+    // Автоматический пересчет при изменении полей
+    const termInput = document.getElementById('redemption-term');
+    const sumInput = document.getElementById('redemption-sum');
+
+    if (termInput) {
+        termInput.addEventListener('change', () => {
+            if (termInput.value && sumInput.value) {
+                calculateRedemption();
+            }
+        });
+    }
+
+    if (sumInput) {
+        sumInput.addEventListener('change', () => {
+            if (termInput.value && sumInput.value) {
+                calculateRedemption();
+            }
+        });
+    }
+}
+
 // ========== GLOBAL FUNCTIONS (for onclick handlers) ==========
 window.deleteRow = deleteRow;
 window.addFixedPremiumRow = addFixedPremiumRow;
@@ -3616,3 +4074,5 @@ window.editSegment = editSegment;
 window.deleteSegment = deleteSegment;
 window.editProductGroup = editProductGroup;
 window.deleteProductGroup = deleteProductGroup;
+window.deleteStandardKV = deleteStandardKV;
+window.deleteAssetKV = deleteAssetKV;
