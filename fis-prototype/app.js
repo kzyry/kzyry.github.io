@@ -1498,44 +1498,122 @@ function collectFormData() {
 }
 
 function validateProduct() {
-    // Check only required fields that belong to current user's role or have no owner
-    const requiredFields = [
-        { id: 'priority', role: 'Продуктолог' },
-        { id: 'launch-date', role: 'Продуктолог' },
-        { id: 'marketing-name', role: 'Продуктолог' },
-        { id: 'partner', role: 'Продуктолог' },
-        { id: 'segment', role: 'Продуктолог' },
-        { id: 'product-group', role: 'Продуктолог' }
-    ];
+    // Define ALL required fields for ALL roles
+    const REQUIRED_FIELDS_BY_ROLE = {
+        'Продуктолог': [
+            { id: 'priority', label: 'Приоритет запуска' },
+            { id: 'launch-date', label: 'Планируемая дата запуска' },
+            { id: 'marketing-name', label: 'Маркетинговое название' },
+            { id: 'partner', label: 'Партнёр' },
+            { id: 'segment', label: 'Сегмент' },
+            { id: 'product-group', label: 'Группа продукта' }
+        ],
+        'Андеррайтер': [
+            { id: 'currency', label: 'Валюта договора', type: 'checkbox-group' },
+            { id: 'frequency', label: 'Периодичность оплаты', type: 'checkbox-group' }
+        ],
+        'Актуарий': [
+            { id: 'llob', label: 'Линия бизнеса (LLOB)' }
+        ],
+        'Методолог': [
+            { id: 'contract-template', label: 'Шаблон договора', type: 'editor' }
+        ]
+    };
 
-    for (const fieldInfo of requiredFields) {
-        // Only validate if field belongs to current user's role
-        if (fieldInfo.role === currentUser.role) {
-            const field = document.getElementById(fieldInfo.id);
-            if (!field.value) {
-                showToast(`Заполните поле: ${field.previousElementSibling.textContent}`, 'error');
-                field.focus();
-                return false;
+    const missingFields = [];
+
+    // Check all required fields for all roles
+    for (const [role, fields] of Object.entries(REQUIRED_FIELDS_BY_ROLE)) {
+        for (const fieldInfo of fields) {
+            let isEmpty = false;
+
+            if (fieldInfo.type === 'checkbox-group') {
+                // Check checkbox group
+                const checked = getSelectedValues(`input[name="${fieldInfo.id}"]`);
+                isEmpty = checked.length === 0;
+            } else if (fieldInfo.type === 'editor') {
+                // Check WYSIWYG editor
+                const editor = document.getElementById(fieldInfo.id);
+                isEmpty = !editor || !editor.value || editor.value.trim() === '';
+            } else {
+                // Check regular input/select
+                const field = document.getElementById(fieldInfo.id);
+                isEmpty = !field || !field.value || field.value.trim() === '';
+            }
+
+            if (isEmpty) {
+                missingFields.push({
+                    role: role,
+                    label: fieldInfo.label
+                });
             }
         }
     }
 
-    // Check currencies and frequencies for Андеррайтер only
-    if (currentUser.role === 'Андеррайтер') {
-        const currencies = getSelectedValues('input[name="currency"]');
-        if (currencies.length === 0) {
-            showToast('Выберите хотя бы одну валюту', 'error');
-            return false;
-        }
-
-        const frequencies = getSelectedValues('input[name="frequency"]');
-        if (frequencies.length === 0) {
-            showToast('Выберите хотя бы одну периодичность оплаты', 'error');
-            return false;
-        }
+    // If there are missing fields, show validation modal
+    if (missingFields.length > 0) {
+        showValidationModal(missingFields);
+        return false;
     }
 
     return true;
+}
+
+function showValidationModal(missingFields) {
+    // Remove existing modal if any
+    const existingModal = document.querySelector('.validation-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // Group by role
+    const fieldsByRole = {};
+    missingFields.forEach(field => {
+        if (!fieldsByRole[field.role]) {
+            fieldsByRole[field.role] = [];
+        }
+        fieldsByRole[field.role].push(field.label);
+    });
+
+    // Build modal HTML
+    const modalHTML = `
+        <div class="validation-modal" onclick="closeValidationModal(event)">
+            <div class="validation-modal-content" onclick="event.stopPropagation()">
+                <div class="validation-modal-header">
+                    <h3>⚠️ Заполните обязательные поля</h3>
+                    <button class="modal-close-btn" onclick="closeValidationModal()">&times;</button>
+                </div>
+                <div class="validation-modal-body">
+                    <p>Перед отправкой на согласование необходимо заполнить следующие поля:</p>
+                    <div class="missing-fields-list">
+                        ${Object.entries(fieldsByRole).map(([role, fields]) => `
+                            <div class="role-fields-group">
+                                <h4>${role}</h4>
+                                <ul>
+                                    ${fields.map(label => `<li>${label}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="validation-modal-footer">
+                    <button class="btn btn-primary" onclick="closeValidationModal()">Понятно</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function closeValidationModal(event) {
+    if (event) {
+        event.stopPropagation();
+    }
+    const modal = document.querySelector('.validation-modal');
+    if (modal) {
+        modal.remove();
+    }
 }
 
 function clearForm() {
@@ -1754,6 +1832,11 @@ function editProduct(id) {
         renderApprovalPanel(product);
         initArtifactsHandlers(product.id);
         initLaunchChecklist(product.id);
+
+        // Block editing if product is sent to CB
+        if (product.status === 'sent_to_cb') {
+            blockProductEditing();
+        }
     }, 200);
 }
 
@@ -4395,11 +4478,45 @@ function updateChecklistCategoryCounters() {
     });
 }
 
+// ========== BLOCK PRODUCT EDITING (Status: Sent to CB) ==========
+function blockProductEditing() {
+    // Block all form inputs
+    const formFields = document.querySelectorAll(
+        '#product-form input, ' +
+        '#product-form textarea, ' +
+        '#product-form select, ' +
+        '#product-form button:not(.back-btn)'
+    );
+
+    formFields.forEach(field => {
+        field.disabled = true;
+        field.style.cursor = 'not-allowed';
+        field.style.opacity = '0.6';
+    });
+
+    // Show lock indicator
+    const productHeader = document.querySelector('.product-header');
+    if (productHeader && !document.querySelector('.status-indicator-locked')) {
+        const indicator = document.createElement('div');
+        indicator.className = 'status-indicator-locked';
+        indicator.innerHTML = '🔒 Документ заблокирован. Отправлено в ЦБ';
+        productHeader.appendChild(indicator);
+    }
+
+    // Override save product function to prevent saving
+    const originalSaveProduct = window.saveProduct;
+    window.saveProduct = function() {
+        showToast('⛔ Редактирование запрещено. Документ отправлен в ЦБ', 'error');
+        return false;
+    };
+}
+
 // ========== GLOBAL FUNCTIONS (for onclick handlers) ==========
 window.deleteRow = deleteRow;
 window.addFixedPremiumRow = addFixedPremiumRow;
 window.editProduct = editProduct;
 window.copyProduct = copyProduct;
+window.closeValidationModal = closeValidationModal;
 window.deleteProduct = deleteProduct;
 window.editPartner = editPartner;
 window.deletePartner = deletePartner;
