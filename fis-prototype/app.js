@@ -19,7 +19,9 @@ const AppState = {
         search: ''
     },
     // Block 5.1: Audit log for tracking all changes
-    auditLog: []
+    auditLog: [],
+    // Notification system
+    notifications: []
 };
 
 // ========== INITIALIZATION ==========
@@ -38,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function initApp() {
     loadProducts();
     loadAuditLog(); // Block 5.1: Load audit log from localStorage
+    loadNotifications(); // Load notifications from localStorage
     initFinancialModels(); // Initialize financial models data
     initNavigation();
     initTabs();
@@ -51,6 +54,7 @@ function initApp() {
     renderDashboard();
     updateUserProfile();
     applyRoleBasedAccess();
+    updateNotificationBadge(); // Update notification badge on app init
 }
 
 // ========== AUTHENTICATION ==========
@@ -341,6 +345,25 @@ function changeStatus(product, newStatus, comment = '') {
         { newStatus, comment }
     );
 
+    // Add notification for status change
+    const statusLabels = {
+        'draft': 'Черновик',
+        'approval': 'Согласование',
+        'approved': 'Согласовано',
+        'sent_to_cb': 'Отправлено в ЦБ'
+    };
+
+    const productName = product.data?.marketingName || 'Без названия';
+    const statusLabel = statusLabels[newStatus] || newStatus;
+
+    addNotification(
+        'status_change',
+        'Изменение статуса',
+        `Продукт "${productName}" переведен в статус "${statusLabel}"${comment ? `: ${comment}` : ''}`,
+        product.id,
+        productName
+    );
+
     return true;
 }
 
@@ -379,6 +402,16 @@ function approveByRole(product, role, comment = '') {
         { role, comment }
     );
 
+    // Add notification for approval
+    const productName = product.data?.marketingName || 'Без названия';
+    addNotification(
+        'approval_granted',
+        'Согласование получено',
+        `${role} согласовал продукт "${productName}"${comment ? `: ${comment}` : ''}`,
+        product.id,
+        productName
+    );
+
     renderApprovalPanel(product);
     updateLaunchReadiness(product.id);
 }
@@ -404,6 +437,16 @@ function rejectByRole(product, role, comment) {
         product.id,
         product.data?.marketingName || 'Без названия',
         { role, comment }
+    );
+
+    // Add notification for rejection
+    const productName = product.data?.marketingName || 'Без названия';
+    addNotification(
+        'approval_rejected',
+        'Согласование отклонено',
+        `${role} отклонил продукт "${productName}": ${comment}`,
+        product.id,
+        productName
     );
 
     showToast('Продукт отклонен и возвращен в черновик', 'info');
@@ -701,6 +744,17 @@ function requestReturnToApproval(productId) {
     });
 
     saveData();
+
+    // Add notification for return request
+    const productName = product.data?.marketingName || 'Без названия';
+    addNotification(
+        'return_request',
+        'Запрос на возврат',
+        `${currentUser.role} запросил возврат продукта "${productName}" на согласование: ${comment}`,
+        product.id,
+        productName
+    );
+
     renderApprovalPanel(product);
     showToast('Запрос на возврат отправлен продуктологу', 'success');
 }
@@ -2379,6 +2433,186 @@ function logAuditEntry(action, productId, productName, details = {}) {
     saveAuditLog();
 
     console.log('📝 Audit log entry:', entry);
+}
+
+// ========== NOTIFICATION SYSTEM ==========
+function loadNotifications() {
+    const stored = localStorage.getItem('notifications');
+    if (stored) {
+        AppState.notifications = JSON.parse(stored);
+    } else {
+        AppState.notifications = [];
+    }
+}
+
+function saveNotifications() {
+    localStorage.setItem('notifications', JSON.stringify(AppState.notifications));
+}
+
+function addNotification(type, title, message, productId, productName) {
+    const notification = {
+        id: Date.now() + Math.random(),
+        type: type, // 'status_change', 'approval_request', 'approval_granted', 'approval_rejected', 'return_request'
+        title: title,
+        message: message,
+        productId: productId,
+        productName: productName,
+        timestamp: new Date().toISOString(),
+        read: false,
+        targetRole: currentUser.role || 'all'
+    };
+
+    AppState.notifications.unshift(notification);
+
+    // Keep only last 100 notifications
+    if (AppState.notifications.length > 100) {
+        AppState.notifications = AppState.notifications.slice(0, 100);
+    }
+
+    saveNotifications();
+    updateNotificationBadge();
+
+    console.log('🔔 New notification:', notification);
+}
+
+function markNotificationAsRead(notificationId) {
+    const notification = AppState.notifications.find(n => n.id === notificationId);
+    if (notification) {
+        notification.read = true;
+        saveNotifications();
+        updateNotificationBadge();
+    }
+}
+
+function markAllNotificationsAsRead() {
+    AppState.notifications.forEach(n => n.read = true);
+    saveNotifications();
+    updateNotificationBadge();
+}
+
+function updateNotificationBadge() {
+    const unreadCount = AppState.notifications.filter(n => !n.read).length;
+    const badge = document.querySelector('.notification-badge');
+
+    if (badge) {
+        if (unreadCount > 0) {
+            badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+function toggleNotificationPanel() {
+    const panel = document.getElementById('notification-panel');
+    if (!panel) {
+        createNotificationPanel();
+    } else {
+        if (panel.classList.contains('active')) {
+            panel.classList.remove('active');
+        } else {
+            renderNotifications();
+            panel.classList.add('active');
+        }
+    }
+}
+
+function createNotificationPanel() {
+    const existing = document.getElementById('notification-panel');
+    if (existing) {
+        existing.remove();
+    }
+
+    const panel = document.createElement('div');
+    panel.id = 'notification-panel';
+    panel.className = 'notification-panel';
+    panel.innerHTML = `
+        <div class="notification-header">
+            <h3>Уведомления</h3>
+            <div class="notification-actions">
+                <button class="btn-icon" onclick="markAllNotificationsAsRead()" title="Отметить все прочитанными">
+                    ✓
+                </button>
+                <button class="btn-icon" onclick="toggleNotificationPanel()" title="Закрыть">
+                    ✕
+                </button>
+            </div>
+        </div>
+        <div class="notification-list" id="notification-list">
+            <!-- Notifications will be rendered here -->
+        </div>
+    `;
+
+    document.body.appendChild(panel);
+    renderNotifications();
+    panel.classList.add('active');
+}
+
+function renderNotifications() {
+    const list = document.getElementById('notification-list');
+    if (!list) return;
+
+    if (AppState.notifications.length === 0) {
+        list.innerHTML = `
+            <div class="notification-empty">
+                <div class="notification-empty-icon">🔔</div>
+                <div class="notification-empty-text">Нет уведомлений</div>
+            </div>
+        `;
+        return;
+    }
+
+    const notificationsHTML = AppState.notifications.map(n => {
+        const icon = {
+            'status_change': '📄',
+            'approval_request': '📝',
+            'approval_granted': '✅',
+            'approval_rejected': '❌',
+            'return_request': '🔄'
+        }[n.type] || '🔔';
+
+        const date = new Date(n.timestamp);
+        const timeAgo = getTimeAgo(date);
+
+        return `
+            <div class="notification-item ${n.read ? 'read' : 'unread'}" onclick="handleNotificationClick(${n.id}, ${n.productId})">
+                <div class="notification-icon">${icon}</div>
+                <div class="notification-content">
+                    <div class="notification-title">${n.title}</div>
+                    <div class="notification-message">${n.message}</div>
+                    <div class="notification-time">${timeAgo}</div>
+                </div>
+                ${!n.read ? '<div class="notification-unread-dot"></div>' : ''}
+            </div>
+        `;
+    }).join('');
+
+    list.innerHTML = notificationsHTML;
+}
+
+function handleNotificationClick(notificationId, productId) {
+    markNotificationAsRead(notificationId);
+    toggleNotificationPanel();
+
+    if (productId) {
+        editProduct(productId);
+    }
+}
+
+function getTimeAgo(date) {
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'только что';
+    if (diffMins < 60) return `${diffMins} мин назад`;
+    if (diffHours < 24) return `${diffHours} ч назад`;
+    if (diffDays < 7) return `${diffDays} д назад`;
+
+    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
 }
 
 // ========== AUTOSAVE ==========
@@ -4792,6 +5026,9 @@ window.exportProductPassport = exportProductPassport;
 window.deleteProduct = deleteProduct;
 window.editPartner = editPartner;
 window.deletePartner = deletePartner;
+window.toggleNotificationPanel = toggleNotificationPanel;
+window.markAllNotificationsAsRead = markAllNotificationsAsRead;
+window.handleNotificationClick = handleNotificationClick;
 window.editSegment = editSegment;
 window.deleteSegment = deleteSegment;
 window.editProductGroup = editProductGroup;
