@@ -2226,7 +2226,7 @@ body {
 }
 
 .notification-icon {
-    font-size: 18px;
+    font-size: 9px;
 }
 
 .notification-badge {
@@ -2335,8 +2335,8 @@ body {
     opacity: 0.7;
 }
 
-.notification-icon {
-    font-size: 24px;
+.notification-item .notification-icon {
+    font-size: 12px;
     flex-shrink: 0;
 }
 
