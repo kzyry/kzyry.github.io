@@ -504,6 +504,162 @@ function renderApprovalPanel(product) {
             }
         }
     }
+
+    // Show filling progress for "draft" status
+    if (product.status === 'draft') {
+        renderFillingProgress(product);
+    }
+
+    // Show export button for "sent_to_cb" status (Продуктолог only)
+    if (product.status === 'sent_to_cb' && currentUser?.role === 'Продуктолог') {
+        const actionsEl = document.getElementById('approval-actions-productolog');
+        if (actionsEl) {
+            actionsEl.innerHTML = `
+                <button class="btn btn-primary btn-sm" onclick="exportProductPassport(${product.id})">
+                    📥 Экспортировать паспорт
+                </button>
+            `;
+        }
+    }
+}
+
+function renderFillingProgress(product) {
+    const panel = document.getElementById('approval-panel');
+    if (!panel) return;
+
+    // Remove existing progress section
+    const existing = panel.querySelector('.filling-progress-section');
+    if (existing) {
+        existing.remove();
+    }
+
+    // Configuration from validateProduct
+    const REQUIRED_FIELDS_BY_ROLE = {
+        'Продуктолог': [
+            { id: 'priority', label: 'Приоритет запуска' },
+            { id: 'launch-date', label: 'Планируемая дата запуска' },
+            { id: 'marketing-name', label: 'Маркетинговое название' },
+            { id: 'partner', label: 'Партнёр' },
+            { id: 'segment', label: 'Сегмент' },
+            { id: 'product-group', label: 'Группа продукта' }
+        ],
+        'Андеррайтер': [
+            { id: 'currency', label: 'Валюта договора', type: 'checkbox-group' },
+            { id: 'frequency', label: 'Периодичность оплаты', type: 'checkbox-group' }
+        ],
+        'Актуарий': [
+            { id: 'llob', label: 'Линия бизнеса (LLOB)' }
+        ],
+        'Методолог': [
+            { id: 'contract-template', label: 'Шаблон договора', type: 'editor' }
+        ]
+    };
+
+    const rolesHTML = Object.entries(REQUIRED_FIELDS_BY_ROLE).map(([role, fields]) => {
+        let filled = 0;
+
+        fields.forEach(fieldInfo => {
+            let hasValue = false;
+
+            if (fieldInfo.type === 'checkbox-group') {
+                const checked = getSelectedValues(`input[name="${fieldInfo.id}"]`);
+                hasValue = checked.length > 0;
+            } else if (fieldInfo.type === 'editor') {
+                const editor = document.getElementById(fieldInfo.id);
+                hasValue = editor && editor.value && editor.value.trim() !== '';
+            } else {
+                const field = document.getElementById(fieldInfo.id);
+                hasValue = field && field.value && field.value.trim() !== '';
+            }
+
+            if (hasValue) filled++;
+        });
+
+        const total = fields.length;
+        const percent = Math.round((filled / total) * 100);
+        const color = percent < 33 ? '#f44336' : percent < 66 ? '#FF9800' : percent < 100 ? '#2196F3' : '#4CAF50';
+
+        return `
+            <div class="role-progress">
+                <div class="role-progress-header">
+                    <span class="role-name">${role}</span>
+                    <span class="role-progress-percent" style="color: ${color};">${percent}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${percent}%; background: ${color};"></div>
+                </div>
+                <div class="role-progress-details">
+                    Заполнено: ${filled} из ${total} полей
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    const progressHTML = `
+        <div class="filling-progress-section" style="margin-top: 24px; padding: 16px; background: var(--bg-tertiary); border-radius: 6px;">
+            <h3 style="margin: 0 0 16px 0;">Прогресс заполнения по ролям</h3>
+            ${rolesHTML}
+        </div>
+    `;
+
+    panel.insertAdjacentHTML('beforeend', progressHTML);
+}
+
+function exportProductPassport(productId) {
+    const product = AppState.products.find(p => p.id === productId);
+    if (!product) {
+        showToast('Продукт не найден', 'error');
+        return;
+    }
+
+    // Prepare passport data
+    const passport = {
+        meta: {
+            exportDate: new Date().toISOString(),
+            exportedBy: currentUser?.name || currentUser?.role || 'Неизвестный пользователь',
+            productId: product.id,
+            version: '1.0'
+        },
+        product: {
+            // Basic info
+            id: product.id,
+            marketingName: product.data?.marketingName || '',
+            status: product.status,
+            priority: product.data?.priority || '',
+            launchDate: product.data?.launchDate || '',
+            closeDate: product.data?.closeDate || '',
+
+            // Business context
+            partner: product.data?.partner || '',
+            segment: product.data?.segment || '',
+            productGroup: product.data?.productGroup || '',
+            productCode: product.data?.productCode || '',
+
+            // Complete product data
+            allData: product.data
+        },
+        approvals: product.approvals || {},
+        artifacts: loadArtifacts(productId) || {},
+        checklist: loadChecklist(productId) || {},
+        history: product.history || [],
+        returnRequests: product.returnRequests || []
+    };
+
+    // Create filename
+    const date = new Date().toISOString().split('T')[0];
+    const name = (product.data?.marketingName || 'product').replace(/[^a-zа-яё0-9]/gi, '_');
+    const filename = `passport_${name}_${date}.json`;
+
+    // Download as JSON
+    const blob = new Blob([JSON.stringify(passport, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    showToast(`Паспорт экспортирован: ${filename}`, 'success');
 }
 
 function approveProduct() {
@@ -4632,6 +4788,7 @@ window.copyProduct = copyProduct;
 window.closeValidationModal = closeValidationModal;
 window.requestReturnToApproval = requestReturnToApproval;
 window.returnToApproval = returnToApproval;
+window.exportProductPassport = exportProductPassport;
 window.deleteProduct = deleteProduct;
 window.editPartner = editPartner;
 window.deletePartner = deletePartner;
