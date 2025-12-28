@@ -753,6 +753,20 @@ function initDynamicTables() {
             addTableRow('insurance-payouts-table');
         });
     }
+
+    const addBeneficiaryDeathBtn = document.getElementById('add-beneficiary-death-row');
+    if (addBeneficiaryDeathBtn) {
+        addBeneficiaryDeathBtn.addEventListener('click', () => {
+            addTableRow('beneficiaries-death-table');
+        });
+    }
+
+    const addRedemptionBtn = document.getElementById('add-redemption-row');
+    if (addRedemptionBtn) {
+        addRedemptionBtn.addEventListener('click', () => {
+            addTableRow('redemption-table');
+        });
+    }
 }
 
 function generateMinPremiumTable() {
@@ -1446,7 +1460,30 @@ function collectFormData() {
         templateInsuredFirstname: document.getElementById('template-insured-firstname').value,
         templateInsuredMiddlename: document.getElementById('template-insured-middlename').value,
         templateInsuredBirthdate: document.getElementById('template-insured-birthdate').value,
-        sameAsPolicyholder: document.getElementById('same-as-policyholder').checked
+        sameAsPolicyholder: document.getElementById('same-as-policyholder').checked,
+
+        // Новые поля (добавлены 28.12.2025)
+        insuranceType: document.getElementById('insurance-type').value,
+        gracePeriod: document.getElementById('grace-period').value,
+        coolingOffPeriod: document.getElementById('cooling-off-period').value,
+
+        // Дополнительные поля Страхователя
+        templatePolicyholderGender: document.getElementById('template-policyholder-gender').value,
+        templatePolicyholderBirthplace: document.getElementById('template-policyholder-birthplace').value,
+        templatePolicyholderCitizenship: document.getElementById('template-policyholder-citizenship').value,
+        templatePolicyholderEmail: document.getElementById('template-policyholder-email').value,
+        templatePolicyholderPassportDate: document.getElementById('template-policyholder-passport-date').value,
+        templatePolicyholderPassportIssued: document.getElementById('template-policyholder-passport-issued').value,
+
+        // Выгодоприобретатели
+        beneficiarySurvivalLastname: document.getElementById('beneficiary-survival-lastname').value,
+        beneficiarySurvivalFirstname: document.getElementById('beneficiary-survival-firstname').value,
+        beneficiarySurvivalMiddlename: document.getElementById('beneficiary-survival-middlename').value,
+        beneficiarySurvivalBirthdate: document.getElementById('beneficiary-survival-birthdate').value,
+        beneficiariesDeath: collectTableData('beneficiaries-death-table'),
+
+        // Выкупные суммы
+        redemptionTable: collectTableData('redemption-table')
     };
 }
 
@@ -1818,6 +1855,16 @@ function loadProductData(data) {
         // Load insurance payouts table
         if (data.insurancePayouts) {
             loadTableData('insurance-payouts-table', data.insurancePayouts);
+        }
+
+        // Load beneficiaries death table
+        if (data.beneficiariesDeath) {
+            loadTableData('beneficiaries-death-table', data.beneficiariesDeath);
+        }
+
+        // Load redemption table
+        if (data.redemptionTable) {
+            loadTableData('redemption-table', data.redemptionTable);
         }
     }, 100);
 }
@@ -3089,7 +3136,8 @@ function loadTestData() {
                 { col0: 'СЛП', col1: 'COVR-001', col2: 'LLOB-LIFE', col3: 'Cover-Life-Premium', col4: 'Договор', col5: 'Обязательный' }
             ],
             services: [
-                { col0: 'SRV-001', col1: 'Консультация врача', col2: 'Активен', col3: 'SUBTYPE-001', col4: 'Базовый', col5: 'Сервис' }
+                { col0: 'TAX1', col1: 'Налоговый вычет', col2: 'TAX', col3: '2001', col4: 'Сервисы Налоговой Поддержки', col5: 'Оформление документов для получения налогового вычета', col6: 'Ежегодно', col7: '1 консультация', col8: '2025-01-01', col9: '', col10: 'Открыт' },
+                { col0: 'MED1', col1: 'Телемедицина 24/7', col2: 'MED', col3: '3001', col4: 'Медицинские консультации', col5: 'Онлайн консультации врачей', col6: 'Неограниченно', col7: 'Без ограничений', col8: '2025-01-01', col9: '', col10: 'Открыт' }
             ],
             // Страховые риски и выплаты
             insuranceRisks: [
@@ -3114,7 +3162,34 @@ function loadTestData() {
             templateInsuredFirstname: 'Иван',
             templateInsuredMiddlename: 'Иванович',
             templateInsuredBirthdate: '1985-05-20',
-            sameAsPolicyholder: true
+            sameAsPolicyholder: true,
+            // Новые поля (добавлены 28.12.2025)
+            insuranceType: 'Страхование жизни на случай смерти, дожития до определенного возраста или срока либо наступления иного события',
+            gracePeriod: '30',
+            coolingOffPeriod: '30',
+            // Дополнительные поля Страхователя
+            templatePolicyholderGender: 'М',
+            templatePolicyholderBirthplace: 'г. Москва',
+            templatePolicyholderCitizenship: 'Российская Федерация',
+            templatePolicyholderEmail: 'ivanov@example.com',
+            templatePolicyholderPassportDate: '2015-03-10',
+            templatePolicyholderPassportIssued: 'Отделением УФМС России по г. Москве',
+            // Выгодоприобретатели
+            beneficiarySurvivalLastname: 'Иванов',
+            beneficiarySurvivalFirstname: 'Иван',
+            beneficiarySurvivalMiddlename: 'Иванович',
+            beneficiarySurvivalBirthdate: '1985-05-20',
+            beneficiariesDeath: [
+                { col0: 'Иванова', col1: 'Мария', col2: 'Петровна', col3: '1987-08-15', col4: '50' },
+                { col0: 'Иванов', col1: 'Петр', col2: 'Иванович', col3: '2010-03-20', col4: '50' }
+            ],
+            // Выкупные суммы
+            redemptionTable: [
+                { col0: '1', col1: '2025-01-15', col2: '2026-01-14', col3: '0' },
+                { col0: '2', col1: '2026-01-15', col2: '2027-01-14', col3: '50' },
+                { col0: '3', col1: '2027-01-15', col2: '2028-01-14', col3: '75' },
+                { col0: '4', col1: '2028-01-15', col2: '2029-01-14', col3: '90' }
+            ]
         }
     });
 

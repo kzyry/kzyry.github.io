@@ -918,6 +918,11 @@
                                             <option value="36414">36414</option>
                                         </select>
                                     </div>
+
+                                    <div class="form-group full-width">
+                                        <label for="insurance-type">Вид страхования</label>
+                                        <textarea id="insurance-type" data-role-owner="Продуктолог" rows="3" placeholder="Например: Страхование жизни на случай смерти, дожития до определенного возраста или срока либо наступления иного события"></textarea>
+                                    </div>
                                 </div>
                             </section>
                         </div>
@@ -1095,6 +1100,18 @@
                                     <label for="max-insurance-sum-approved">Максимальная страховая сумма основного риска с согласованием СК</label>
                                     <input type="number" id="max-insurance-sum-approved" data-role-owner="Андеррайтер" placeholder="Укажите сумму" step="0.01">
                                 </div>
+
+                                <div class="form-group">
+                                    <label for="grace-period">Льготный период (дней)</label>
+                                    <input type="number" id="grace-period" data-role-owner="Андеррайтер" placeholder="30" min="0" max="365">
+                                    <small class="field-hint">Период для внесения просроченного взноса без последствий</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="cooling-off-period">Период охлаждения (дней)</label>
+                                    <input type="number" id="cooling-off-period" data-role-owner="Андеррайтер" placeholder="30" min="0" max="365">
+                                    <small class="field-hint">Период для отказа от договора с возвратом премии (Указание ЦБ 3854-У)</small>
+                                </div>
                             </div>
 
                             <!-- Группа 4: Дополнительные опции -->
@@ -1242,6 +1259,34 @@
                             <h3>Фиксированные страховые суммы</h3>
                             <p class="help-text">Группируется по периодичности оплаты</p>
                             <div id="fixed-sums-container"></div>
+                        </div>
+
+                        <!-- Таблица: Выкупные суммы -->
+                        <div class="dynamic-table-section">
+                            <h3>Выкупные суммы</h3>
+                            <p class="help-text">Размеры выкупных сумм рассчитываются как процент от оплаченных взносов</p>
+                            <table class="data-table" id="redemption-table">
+                                <thead>
+                                    <tr>
+                                        <th>№ полисного периода</th>
+                                        <th>Начало периода</th>
+                                        <th>Окончание периода</th>
+                                        <th>Выкупная сумма (%)</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="number" min="1" placeholder="1" data-role-owner="Андеррайтер"></td>
+                                        <td><input type="date" data-role-owner="Андеррайтер"></td>
+                                        <td><input type="date" data-role-owner="Андеррайтер"></td>
+                                        <td><input type="number" min="0" max="100" step="0.01" placeholder="0" data-role-owner="Андеррайтер"></td>
+                                        <td><button class="btn-icon" onclick="deleteRow(this)">🗑️</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button type="button" class="btn btn-secondary" id="add-redemption-row">+ Добавить полисный период</button>
+                            <p class="help-text">💡 Выкупная сумма рассчитывается на конец каждого полисного периода. В первый год обычно 0%.</p>
                         </div>
                     </section>
 
@@ -1579,8 +1624,36 @@
                                         <input type="date" id="template-policyholder-birthdate" data-role-owner="Методолог">
                                     </div>
                                     <div class="form-group">
+                                        <label for="template-policyholder-gender">Пол</label>
+                                        <select id="template-policyholder-gender" data-role-owner="Методолог">
+                                            <option value="">Выберите</option>
+                                            <option value="М">Мужской</option>
+                                            <option value="Ж">Женский</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="template-policyholder-birthplace">Место рождения</label>
+                                        <input type="text" id="template-policyholder-birthplace" data-role-owner="Методолог" placeholder="г. Москва">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="template-policyholder-citizenship">Гражданство</label>
+                                        <input type="text" id="template-policyholder-citizenship" data-role-owner="Методолог" placeholder="Российская Федерация">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="template-policyholder-email">E-mail</label>
+                                        <input type="email" id="template-policyholder-email" data-role-owner="Методолог" placeholder="example@mail.ru">
+                                    </div>
+                                    <div class="form-group">
                                         <label for="template-policyholder-passport">Паспорт (серия и номер)</label>
                                         <input type="text" id="template-policyholder-passport" data-role-owner="Методолог" placeholder="1234 567890">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="template-policyholder-passport-date">Дата выдачи паспорта</label>
+                                        <input type="date" id="template-policyholder-passport-date" data-role-owner="Методолог">
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="template-policyholder-passport-issued">Кем выдан</label>
+                                        <input type="text" id="template-policyholder-passport-issued" data-role-owner="Методолог" placeholder="Отделением УФМС России по г. Москве">
                                     </div>
                                     <div class="form-group">
                                         <label for="template-policyholder-phone">Телефон</label>
@@ -1621,6 +1694,63 @@
                                         <label for="template-insured-birthdate">Дата рождения</label>
                                         <input type="date" id="template-insured-birthdate" data-role-owner="Методолог">
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Блок: Выгодоприобретатели -->
+                            <div class="contract-block">
+                                <h3>💰 Выгодоприобретатели</h3>
+
+                                <h4>Выгодоприобретатель по риску Дожитие</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="beneficiary-survival-lastname">Фамилия</label>
+                                        <input type="text" id="beneficiary-survival-lastname" data-role-owner="Методолог" placeholder="Иванова">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="beneficiary-survival-firstname">Имя</label>
+                                        <input type="text" id="beneficiary-survival-firstname" data-role-owner="Методолог" placeholder="Мария">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="beneficiary-survival-middlename">Отчество</label>
+                                        <input type="text" id="beneficiary-survival-middlename" data-role-owner="Методолог" placeholder="Ивановна">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="beneficiary-survival-birthdate">Дата рождения</label>
+                                        <input type="date" id="beneficiary-survival-birthdate" data-role-owner="Методолог">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="beneficiary-survival-share">Доля (%)</label>
+                                        <input type="number" id="beneficiary-survival-share" data-role-owner="Методолог" value="100" readonly style="background: #f0f0f0;">
+                                    </div>
+                                </div>
+
+                                <h4>Выгодоприобретатели по риску Смерть (до 4 человек)</h4>
+                                <div class="dynamic-table-section">
+                                    <table class="data-table" id="beneficiaries-death-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Фамилия</th>
+                                                <th>Имя</th>
+                                                <th>Отчество</th>
+                                                <th>Дата рождения</th>
+                                                <th>Доля (%)</th>
+                                                <th>Действия</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><input type="text" placeholder="Иванов" data-role-owner="Методолог"></td>
+                                                <td><input type="text" placeholder="Сергей" data-role-owner="Методолог"></td>
+                                                <td><input type="text" placeholder="Иванович" data-role-owner="Методолог"></td>
+                                                <td><input type="date" data-role-owner="Методолог"></td>
+                                                <td><input type="number" min="0" max="100" step="0.01" placeholder="50" data-role-owner="Методолог"></td>
+                                                <td><button class="btn-icon" onclick="deleteRow(this)">🗑️</button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" class="btn btn-secondary" id="add-beneficiary-death-row">+ Добавить выгодоприобретателя</button>
+                                    <p class="help-text">💡 Общая сумма долей должна составлять 100%. Максимум 4 выгодоприобретателя.</p>
                                 </div>
                             </div>
                         </section>
