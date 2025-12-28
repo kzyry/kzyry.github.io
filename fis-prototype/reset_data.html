@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Сброс данных</title>
+</head>
+<body>
+    <h1>Сброс данных прототипа</h1>
+    <p>Нажмите кнопку для очистки localStorage и загрузки тестовых данных.</p>
+    <button onclick="resetData()">Очистить данные</button>
+    <p id="status"></p>
+
+    <script>
+        function resetData() {
+            localStorage.clear();
+            document.getElementById('status').textContent = '✅ Данные очищены! Перезагрузите главную страницу.';
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
