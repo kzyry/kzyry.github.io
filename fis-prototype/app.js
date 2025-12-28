@@ -576,7 +576,7 @@ function renderFillingProgress(product) {
         existing.remove();
     }
 
-    // Configuration from validateProduct
+    // Configuration from validateProduct (согласно ТЗ v3 раздел 6)
     const REQUIRED_FIELDS_BY_ROLE = {
         'Продуктолог': [
             { id: 'priority', label: 'Приоритет запуска' },
@@ -584,17 +584,22 @@ function renderFillingProgress(product) {
             { id: 'marketing-name', label: 'Маркетинговое название' },
             { id: 'partner', label: 'Партнёр' },
             { id: 'segment', label: 'Сегмент' },
-            { id: 'product-group', label: 'Группа продукта' }
+            { id: 'product-group', label: 'Группа продукта' },
+            { id: 'product-code', label: 'Код продукта' },
+            { id: 'lk-card-type', label: 'Тип карточки в ЛК' },
+            { id: 'agency-code', label: 'Код Агентского договора (АД)' }
         ],
         'Андеррайтер': [
             { id: 'currency', label: 'Валюта договора', type: 'checkbox-group' },
-            { id: 'frequency', label: 'Периодичность оплаты', type: 'checkbox-group' }
+            { id: 'frequency', label: 'Периодичность оплаты', type: 'checkbox-group' },
+            { id: 'payment-frequencies', label: 'Доступная частота платежей', type: 'checkbox-group' }
         ],
         'Актуарий': [
             { id: 'llob', label: 'Линия бизнеса (LLOB)' }
         ],
         'Методолог': [
-            { id: 'contract-template', label: 'Шаблон договора', type: 'editor' }
+            { id: 'template-editor', label: 'Шаблон договора', type: 'editor' },
+            { id: 'insurance-rules', label: 'Правила страхования' }
         ]
     };
 
