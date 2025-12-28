@@ -758,6 +758,196 @@
                             <div class="approval-status" id="approval-status-methodologist"></div>
                             <div class="approval-actions" id="approval-actions-methodologist"></div>
                         </div>
+                        <div class="approval-card">
+                            <div class="role-name">Юрист</div>
+                            <div class="approval-status" id="approval-status-lawyer"></div>
+                            <div class="approval-actions" id="approval-actions-lawyer"></div>
+                        </div>
+                        <div class="approval-card">
+                            <div class="role-name">Финансист</div>
+                            <div class="approval-status" id="approval-status-financier"></div>
+                            <div class="approval-actions" id="approval-actions-financier"></div>
+                        </div>
+                    </div>
+
+                    <!-- Прогресс-бар готовности к запуску -->
+                    <div class="launch-readiness-section" style="margin-top: 32px;">
+                        <h3>Готовность к запуску</h3>
+                        <div class="readiness-progress-bar" style="background: #e0e0e0; border-radius: 8px; height: 32px; position: relative; overflow: hidden; margin-bottom: 16px;">
+                            <div id="readiness-progress-fill" style="background: linear-gradient(90deg, #4CAF50, #45a049); height: 100%; width: 0%; transition: width 0.5s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px;"></div>
+                        </div>
+                        <div class="readiness-stats" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px;">
+                            <div class="readiness-stat-card" style="padding: 12px; background: #f5f5f5; border-radius: 6px; text-align: center;">
+                                <div style="font-size: 24px; font-weight: bold; color: #2196F3;" id="readiness-approvals">0/6</div>
+                                <div style="font-size: 12px; color: #666;">Согласования</div>
+                            </div>
+                            <div class="readiness-stat-card" style="padding: 12px; background: #f5f5f5; border-radius: 6px; text-align: center;">
+                                <div style="font-size: 24px; font-weight: bold; color: #FF9800;" id="readiness-artifacts">0/6</div>
+                                <div style="font-size: 12px; color: #666;">Артефакты</div>
+                            </div>
+                            <div class="readiness-stat-card" style="padding: 12px; background: #f5f5f5; border-radius: 6px; text-align: center;">
+                                <div style="font-size: 24px; font-weight: bold; color: #9C27B0;" id="readiness-checklist">0/16</div>
+                                <div style="font-size: 12px; color: #666;">Чеклист</div>
+                            </div>
+                            <div class="readiness-stat-card" style="padding: 12px; background: #f5f5f5; border-radius: 6px; text-align: center;">
+                                <div style="font-size: 24px; font-weight: bold; color: #4CAF50;" id="readiness-total">0%</div>
+                                <div style="font-size: 12px; color: #666;">Готовность</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Расширенный чеклист согласования -->
+                    <div class="approval-checklist-section" style="margin-top: 24px;">
+                        <h3>Чеклист готовности к запуску</h3>
+                        <p class="help-text">Отметьте все пункты перед отправкой продукта в производство</p>
+
+                        <!-- Категория 1: Бизнес-параметры -->
+                        <div class="checklist-category card" style="margin-bottom: 16px;">
+                            <div class="checklist-category-header" style="background: #2196F3; color: white; padding: 12px; border-radius: 6px 6px 0 0; font-weight: bold;">
+                                📊 Бизнес-параметры (4/4)
+                            </div>
+                            <div class="checklist-category-body" style="padding: 16px;">
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="business" data-item="priority" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>Приоритет и даты запуска заполнены</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Указаны приоритет, планируемая дата запуска и дата закрытия</p>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="business" data-item="partner" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>Партнер и сегмент определены</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Выбран партнер, сегмент и группа продуктов</p>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="business" data-item="product-type" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>Тип продукта и привязка к активам</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Указан тип продукта (ИСЖ/НСЖ), настроена привязка к активам при необходимости</p>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="business" data-item="marketing-name" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>Маркетинговое название утверждено</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Согласовано уникальное маркетинговое название продукта</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Категория 2: Финансовая модель -->
+                        <div class="checklist-category card" style="margin-bottom: 16px;">
+                            <div class="checklist-category-header" style="background: #FF9800; color: white; padding: 12px; border-radius: 6px 6px 0 0; font-weight: bold;">
+                                💰 Финансовая модель (4/4)
+                            </div>
+                            <div class="checklist-category-body" style="padding: 16px;">
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="financial" data-item="premium-sum" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>Страховой взнос и суммы настроены</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Заполнены валюты, периодичность, минимальные/максимальные взносы и суммы</p>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="financial" data-item="kv-ladder" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>Лесенка КВ заполнена</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Настроена лесенка комиссионного вознаграждения (стандартная или с активами)</p>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="financial" data-item="financial-models" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>Финансовые модели загружены</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Загружены конфигурации финансовых моделей в разделе "Финансовые модели"</p>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="financial" data-item="redemption" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>Выкупные суммы рассчитаны</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Выполнен расчет выкупных сумм для всех сроков страхования</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Категория 3: Документы и артефакты -->
+                        <div class="checklist-category card" style="margin-bottom: 16px;">
+                            <div class="checklist-category-header" style="background: #9C27B0; color: white; padding: 12px; border-radius: 6px 6px 0 0; font-weight: bold;">
+                                📄 Документы и артефакты (4/4)
+                            </div>
+                            <div class="checklist-category-body" style="padding: 16px;">
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="documents" data-item="template" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>Шаблон договора создан</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Разработан и согласован шаблон договора страхования</p>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="documents" data-item="rules" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>Правила страхования загружены</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Загружены и утверждены Правила страхования</p>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="documents" data-item="kid" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>KID подготовлен</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Ключевой информационный документ создан и загружен</p>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="documents" data-item="all-artifacts" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>Все артефакты загружены</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Загружены все 6 обязательных документов (Правила, KID, Декларация, Записка, Заявление, Анкеты)</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Категория 4: Системная готовность -->
+                        <div class="checklist-category card" style="margin-bottom: 16px;">
+                            <div class="checklist-category-header" style="background: #4CAF50; color: white; padding: 12px; border-radius: 6px 6px 0 0; font-weight: bold;">
+                                ⚙️ Системная готовность (4/4)
+                            </div>
+                            <div class="checklist-category-body" style="padding: 16px;">
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="system" data-item="all-approvals" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>Все согласования получены</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Продукт согласован всеми 6 ролями (Продуктолог, Андеррайтер, Актуарий, Методолог, Юрист, Финансист)</p>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="system" data-item="data-validated" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>Данные валидированы</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Все обязательные поля заполнены, данные прошли валидацию</p>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="system" data-item="integration-ready" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>Интеграции подготовлены</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Настроены все необходимые интеграции с внешними системами</p>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" style="display: flex; align-items: start; gap: 12px; padding: 8px; cursor: pointer; border-radius: 4px;">
+                                    <input type="checkbox" class="checklist-checkbox" data-category="system" data-item="testing-complete" style="margin-top: 3px;">
+                                    <div>
+                                        <strong>Тестирование завершено</strong>
+                                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #666;">Проведено полное тестирование продукта, все критичные баги исправлены</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -766,6 +956,7 @@
                     <button class="tab-btn active" data-tab="business-context">Бизнес-контекст продукта</button>
                     <button class="tab-btn" data-tab="contract-template">Шаблон договора</button>
                     <button class="tab-btn" data-tab="redemption-calculator">Калькулятор выкупных сумм</button>
+                    <button class="tab-btn" data-tab="artifacts">Артефакты</button>
                 </div>
 
                 <!-- Вкладка: Бизнес-контекст продукта -->
@@ -1977,6 +2168,173 @@
                                     <p>Процент выкупа = (Год полиса / Срок страхования) × 100%</p>
                                     <p>Выкупная сумма = Страховая сумма × (Процент выкупа / 100)</p>
                                     <p><em>Пример:</em> Для срока 10 лет на 5-й год: выкуп = 5/10 × 100% = 50%</p>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вкладка: Артефакты -->
+                <div id="artifacts-tab" class="tab-content">
+                    <div class="role-section" data-role="Юрист">
+                        <div class="role-section-header">
+                            <div class="role-section-title">
+                                <span class="role-section-icon">📄</span>
+                                <span>Управление артефактами продукта</span>
+                                <span class="role-section-badge">
+                                    <span class="status-icon">ℹ️</span>
+                                    <span class="status-text">Документы для запуска</span>
+                                </span>
+                            </div>
+                            <div class="role-section-toggle">
+                                <span class="toggle-text">Свернуть</span>
+                                <span class="role-section-toggle-icon">▼</span>
+                            </div>
+                        </div>
+                        <div class="role-section-content">
+                            <section class="component-section">
+                                <p class="help-text">Загрузите необходимые документы для запуска продукта. Все артефакты должны быть согласованы перед запуском.</p>
+
+                                <!-- Артефакт: Правила страхования -->
+                                <div class="artifact-item card" style="margin-bottom: 16px;">
+                                    <div class="artifact-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                        <div>
+                                            <h4 style="margin: 0;">📋 Правила страхования</h4>
+                                            <p style="margin: 4px 0 0 0; color: #666; font-size: 14px;">Ответственный: Юрист</p>
+                                        </div>
+                                        <div class="artifact-status">
+                                            <span class="badge badge-draft" id="artifact-rules-status">Не загружен</span>
+                                        </div>
+                                    </div>
+                                    <div class="artifact-body">
+                                        <div class="form-group" style="margin-bottom: 8px;">
+                                            <input type="file" id="artifact-rules-file" accept=".pdf,.doc,.docx" style="display: none;">
+                                            <button class="btn btn-sm btn-secondary" onclick="document.getElementById('artifact-rules-file').click()">📤 Загрузить файл</button>
+                                            <button class="btn btn-sm btn-secondary" id="artifact-rules-download" style="display: none;">📥 Скачать</button>
+                                            <button class="btn btn-sm btn-danger" id="artifact-rules-delete" style="display: none;">🗑️ Удалить</button>
+                                        </div>
+                                        <div id="artifact-rules-info" style="display: none; padding: 8px; background: #f5f5f5; border-radius: 4px; font-size: 14px;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Артефакт: KID -->
+                                <div class="artifact-item card" style="margin-bottom: 16px;">
+                                    <div class="artifact-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                        <div>
+                                            <h4 style="margin: 0;">📊 Ключевой информационный документ (KID)</h4>
+                                            <p style="margin: 4px 0 0 0; color: #666; font-size: 14px;">Ответственный: Продуктолог</p>
+                                        </div>
+                                        <div class="artifact-status">
+                                            <span class="badge badge-draft" id="artifact-kid-status">Не загружен</span>
+                                        </div>
+                                    </div>
+                                    <div class="artifact-body">
+                                        <div class="form-group" style="margin-bottom: 8px;">
+                                            <input type="file" id="artifact-kid-file" accept=".pdf,.doc,.docx" style="display: none;">
+                                            <button class="btn btn-sm btn-secondary" onclick="document.getElementById('artifact-kid-file').click()">📤 Загрузить файл</button>
+                                            <button class="btn btn-sm btn-secondary" id="artifact-kid-download" style="display: none;">📥 Скачать</button>
+                                            <button class="btn btn-sm btn-danger" id="artifact-kid-delete" style="display: none;">🗑️ Удалить</button>
+                                        </div>
+                                        <div id="artifact-kid-info" style="display: none; padding: 8px; background: #f5f5f5; border-radius: 4px; font-size: 14px;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Артефакт: Инвестиционная декларация -->
+                                <div class="artifact-item card" style="margin-bottom: 16px;">
+                                    <div class="artifact-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                        <div>
+                                            <h4 style="margin: 0;">💼 Инвестиционная декларация</h4>
+                                            <p style="margin: 4px 0 0 0; color: #666; font-size: 14px;">Ответственный: Актуарий</p>
+                                        </div>
+                                        <div class="artifact-status">
+                                            <span class="badge badge-draft" id="artifact-investment-status">Не загружен</span>
+                                        </div>
+                                    </div>
+                                    <div class="artifact-body">
+                                        <div class="form-group" style="margin-bottom: 8px;">
+                                            <input type="file" id="artifact-investment-file" accept=".pdf,.doc,.docx" style="display: none;">
+                                            <button class="btn btn-sm btn-secondary" onclick="document.getElementById('artifact-investment-file').click()">📤 Загрузить файл</button>
+                                            <button class="btn btn-sm btn-secondary" id="artifact-investment-download" style="display: none;">📥 Скачать</button>
+                                            <button class="btn btn-sm btn-danger" id="artifact-investment-delete" style="display: none;">🗑️ Удалить</button>
+                                        </div>
+                                        <div id="artifact-investment-info" style="display: none; padding: 8px; background: #f5f5f5; border-radius: 4px; font-size: 14px;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Артефакт: Служебная записка -->
+                                <div class="artifact-item card" style="margin-bottom: 16px;">
+                                    <div class="artifact-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                        <div>
+                                            <h4 style="margin: 0;">📝 Служебная записка</h4>
+                                            <p style="margin: 4px 0 0 0; color: #666; font-size: 14px;">Ответственный: Продуктолог</p>
+                                        </div>
+                                        <div class="artifact-status">
+                                            <span class="badge badge-draft" id="artifact-memo-status">Не загружен</span>
+                                        </div>
+                                    </div>
+                                    <div class="artifact-body">
+                                        <div class="form-group" style="margin-bottom: 8px;">
+                                            <input type="file" id="artifact-memo-file" accept=".pdf,.doc,.docx" style="display: none;">
+                                            <button class="btn btn-sm btn-secondary" onclick="document.getElementById('artifact-memo-file').click()">📤 Загрузить файл</button>
+                                            <button class="btn btn-sm btn-secondary" id="artifact-memo-download" style="display: none;">📥 Скачать</button>
+                                            <button class="btn btn-sm btn-danger" id="artifact-memo-delete" style="display: none;">🗑️ Удалить</button>
+                                        </div>
+                                        <div id="artifact-memo-info" style="display: none; padding: 8px; background: #f5f5f5; border-radius: 4px; font-size: 14px;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Артефакт: Заявление -->
+                                <div class="artifact-item card" style="margin-bottom: 16px;">
+                                    <div class="artifact-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                        <div>
+                                            <h4 style="margin: 0;">✍️ Заявление</h4>
+                                            <p style="margin: 4px 0 0 0; color: #666; font-size: 14px;">Ответственный: Методолог</p>
+                                        </div>
+                                        <div class="artifact-status">
+                                            <span class="badge badge-draft" id="artifact-application-status">Не загружен</span>
+                                        </div>
+                                    </div>
+                                    <div class="artifact-body">
+                                        <div class="form-group" style="margin-bottom: 8px;">
+                                            <input type="file" id="artifact-application-file" accept=".pdf,.doc,.docx" style="display: none;">
+                                            <button class="btn btn-sm btn-secondary" onclick="document.getElementById('artifact-application-file').click()">📤 Загрузить файл</button>
+                                            <button class="btn btn-sm btn-secondary" id="artifact-application-download" style="display: none;">📥 Скачать</button>
+                                            <button class="btn btn-sm btn-danger" id="artifact-application-delete" style="display: none;">🗑️ Удалить</button>
+                                        </div>
+                                        <div id="artifact-application-info" style="display: none; padding: 8px; background: #f5f5f5; border-radius: 4px; font-size: 14px;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Артефакт: Анкеты -->
+                                <div class="artifact-item card" style="margin-bottom: 16px;">
+                                    <div class="artifact-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                        <div>
+                                            <h4 style="margin: 0;">📋 Анкеты</h4>
+                                            <p style="margin: 4px 0 0 0; color: #666; font-size: 14px;">Ответственный: Андеррайтер</p>
+                                        </div>
+                                        <div class="artifact-status">
+                                            <span class="badge badge-draft" id="artifact-questionnaire-status">Не загружен</span>
+                                        </div>
+                                    </div>
+                                    <div class="artifact-body">
+                                        <div class="form-group" style="margin-bottom: 8px;">
+                                            <input type="file" id="artifact-questionnaire-file" accept=".pdf,.doc,.docx" style="display: none;">
+                                            <button class="btn btn-sm btn-secondary" onclick="document.getElementById('artifact-questionnaire-file').click()">📤 Загрузить файл</button>
+                                            <button class="btn btn-sm btn-secondary" id="artifact-questionnaire-download" style="display: none;">📥 Скачать</button>
+                                            <button class="btn btn-sm btn-danger" id="artifact-questionnaire-delete" style="display: none;">🗑️ Удалить</button>
+                                        </div>
+                                        <div id="artifact-questionnaire-info" style="display: none; padding: 8px; background: #f5f5f5; border-radius: 4px; font-size: 14px;"></div>
+                                    </div>
+                                </div>
+
+                                <div class="help-box" style="margin-top: 24px;">
+                                    <strong>ℹ️ Статусы документов:</strong>
+                                    <ul style="margin: 8px 0 0 20px;">
+                                        <li><strong>Не загружен</strong> - документ отсутствует</li>
+                                        <li><strong>Загружен</strong> - документ загружен, ожидает проверки</li>
+                                        <li><strong>На согласовании</strong> - документ проверяется ответственным</li>
+                                        <li><strong>Утвержден</strong> - документ согласован и готов</li>
+                                    </ul>
                                 </div>
                             </section>
                         </div>

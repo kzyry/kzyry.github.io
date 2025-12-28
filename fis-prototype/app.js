@@ -380,6 +380,7 @@ function approveByRole(product, role, comment = '') {
     );
 
     renderApprovalPanel(product);
+    updateLaunchReadiness(product.id);
 }
 
 function rejectByRole(product, role, comment) {
@@ -1751,6 +1752,8 @@ function editProduct(id) {
         applyRoleBasedAccess();
         updateApprovalButton(product);
         renderApprovalPanel(product);
+        initArtifactsHandlers(product.id);
+        initLaunchChecklist(product.id);
     }, 200);
 }
 
@@ -4060,6 +4063,336 @@ function initRedemptionCalculator() {
             }
         });
     }
+}
+
+// ========== ARTIFACTS MANAGEMENT ==========
+
+// Типы артефактов
+const ARTIFACT_TYPES = {
+    rules: { name: 'Правила страхования', responsible: 'Юрист' },
+    kid: { name: 'KID', responsible: 'Продуктолог' },
+    investment: { name: 'Инвестиционная декларация', responsible: 'Актуарий' },
+    memo: { name: 'Служебная записка', responsible: 'Продуктолог' },
+    application: { name: 'Заявление', responsible: 'Методолог' },
+    questionnaire: { name: 'Анкеты', responsible: 'Андеррайтер' }
+};
+
+// Загрузка артефактов для текущего продукта
+function loadArtifacts(productId) {
+    const key = `artifacts_${productId}`;
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : {};
+}
+
+// Сохранение артефактов
+function saveArtifacts(productId, artifacts) {
+    const key = `artifacts_${productId}`;
+    localStorage.setItem(key, JSON.stringify(artifacts));
+}
+
+// Обработка загрузки файла
+function handleArtifactUpload(type, file, productId) {
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const artifacts = loadArtifacts(productId);
+
+        artifacts[type] = {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            uploadDate: new Date().toISOString(),
+            data: e.target.result, // Base64 data
+            status: 'uploaded'
+        };
+
+        saveArtifacts(productId, artifacts);
+        updateArtifactUI(type, artifacts[type]);
+        updateLaunchReadiness(productId);
+        showToast(`Файл "${file.name}" успешно загружен`);
+    };
+
+    reader.readAsDataURL(file);
+}
+
+// Обновление UI артефакта
+function updateArtifactUI(type, artifact) {
+    const statusEl = document.getElementById(`artifact-${type}-status`);
+    const infoEl = document.getElementById(`artifact-${type}-info`);
+    const downloadBtn = document.getElementById(`artifact-${type}-download`);
+    const deleteBtn = document.getElementById(`artifact-${type}-delete`);
+
+    if (!artifact) {
+        // Файл не загружен
+        if (statusEl) {
+            statusEl.className = 'badge badge-draft';
+            statusEl.textContent = 'Не загружен';
+        }
+        if (infoEl) infoEl.style.display = 'none';
+        if (downloadBtn) downloadBtn.style.display = 'none';
+        if (deleteBtn) deleteBtn.style.display = 'none';
+        return;
+    }
+
+    // Файл загружен
+    if (statusEl) {
+        statusEl.className = 'badge badge-success';
+        statusEl.textContent = artifact.status === 'approved' ? 'Утвержден' : 'Загружен';
+    }
+
+    if (infoEl) {
+        const uploadDate = new Date(artifact.uploadDate);
+        infoEl.innerHTML = `
+            <strong>📎 ${artifact.name}</strong><br>
+            Размер: ${(artifact.size / 1024).toFixed(2)} КБ<br>
+            Загружен: ${uploadDate.toLocaleDateString('ru-RU')} ${uploadDate.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+        `;
+        infoEl.style.display = 'block';
+    }
+
+    if (downloadBtn) downloadBtn.style.display = 'inline-block';
+    if (deleteBtn) deleteBtn.style.display = 'inline-block';
+}
+
+// Скачивание артефакта
+function downloadArtifact(type, productId) {
+    const artifacts = loadArtifacts(productId);
+    const artifact = artifacts[type];
+
+    if (!artifact) {
+        showToast('Файл не найден', 'error');
+        return;
+    }
+
+    const link = document.createElement('a');
+    link.href = artifact.data;
+    link.download = artifact.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast(`Файл "${artifact.name}" загружен`);
+}
+
+// Удаление артефакта
+function deleteArtifact(type, productId) {
+    if (!confirm('Вы уверены, что хотите удалить этот файл?')) {
+        return;
+    }
+
+    const artifacts = loadArtifacts(productId);
+    delete artifacts[type];
+    saveArtifacts(productId, artifacts);
+
+    updateArtifactUI(type, null);
+    updateLaunchReadiness(productId);
+    showToast('Файл удален');
+}
+
+// Инициализация обработчиков артефактов
+function initArtifactsHandlers(productId) {
+    if (!productId) return;
+
+    // Загрузка существующих артефактов
+    const artifacts = loadArtifacts(productId);
+    Object.keys(ARTIFACT_TYPES).forEach(type => {
+        updateArtifactUI(type, artifacts[type]);
+    });
+
+    // Обработчики загрузки файлов
+    Object.keys(ARTIFACT_TYPES).forEach(type => {
+        const fileInput = document.getElementById(`artifact-${type}-file`);
+        if (fileInput) {
+            // Удаляем старые обработчики
+            const newFileInput = fileInput.cloneNode(true);
+            fileInput.parentNode.replaceChild(newFileInput, fileInput);
+
+            // Добавляем новый обработчик
+            newFileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    handleArtifactUpload(type, e.target.files[0], productId);
+                }
+            });
+        }
+
+        // Обработчик скачивания
+        const downloadBtn = document.getElementById(`artifact-${type}-download`);
+        if (downloadBtn) {
+            // Удаляем старые обработчики
+            const newDownloadBtn = downloadBtn.cloneNode(true);
+            downloadBtn.parentNode.replaceChild(newDownloadBtn, downloadBtn);
+
+            // Добавляем новый обработчик
+            newDownloadBtn.addEventListener('click', () => {
+                downloadArtifact(type, productId);
+            });
+        }
+
+        // Обработчик удаления
+        const deleteBtn = document.getElementById(`artifact-${type}-delete`);
+        if (deleteBtn) {
+            // Удаляем старые обработчики
+            const newDeleteBtn = deleteBtn.cloneNode(true);
+            deleteBtn.parentNode.replaceChild(newDeleteBtn, deleteBtn);
+
+            // Добавляем новый обработчик
+            newDeleteBtn.addEventListener('click', () => {
+                deleteArtifact(type, productId);
+            });
+        }
+    });
+}
+
+// Получение статистики артефактов
+function getArtifactsStats(productId) {
+    const artifacts = loadArtifacts(productId);
+    const total = Object.keys(ARTIFACT_TYPES).length;
+    const uploaded = Object.keys(artifacts).length;
+    const approved = Object.values(artifacts).filter(a => a.status === 'approved').length;
+
+    return {
+        total,
+        uploaded,
+        approved,
+        pending: uploaded - approved,
+        progress: Math.round((uploaded / total) * 100)
+    };
+}
+
+// ========== LAUNCH READINESS CHECKLIST ==========
+
+// Загрузка чеклиста для продукта
+function loadChecklist(productId) {
+    const key = `checklist_${productId}`;
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : {};
+}
+
+// Сохранение чеклиста
+function saveChecklist(productId, checklist) {
+    const key = `checklist_${productId}`;
+    localStorage.setItem(key, JSON.stringify(checklist));
+}
+
+// Инициализация чеклиста
+function initLaunchChecklist(productId) {
+    if (!productId) return;
+
+    const checklist = loadChecklist(productId);
+
+    // Загрузка сохраненного состояния
+    document.querySelectorAll('.checklist-checkbox').forEach(checkbox => {
+        const category = checkbox.dataset.category;
+        const item = checkbox.dataset.item;
+        const key = `${category}_${item}`;
+
+        checkbox.checked = checklist[key] || false;
+
+        // Обработчик изменения
+        checkbox.addEventListener('change', function() {
+            checklist[key] = this.checked;
+            saveChecklist(productId, checklist);
+            updateLaunchReadiness(productId);
+        });
+    });
+
+    // Обновление прогресса
+    updateLaunchReadiness(productId);
+}
+
+// Обновление прогресс-бара готовности к запуску
+function updateLaunchReadiness(productId) {
+    const product = AppState.products.find(p => p.id === productId);
+    if (!product) return;
+
+    // 1. Согласования (6 ролей)
+    let approvalsCount = 0;
+    const approvalsTotal = 6;
+    if (product.approvals) {
+        approvalsCount = Object.values(product.approvals).filter(a => a.approved).length;
+    }
+
+    // 2. Артефакты (6 документов)
+    const artifactsStats = getArtifactsStats(productId);
+    const artifactsCount = artifactsStats.uploaded;
+    const artifactsTotal = artifactsStats.total;
+
+    // 3. Чеклист (16 пунктов)
+    const checklist = loadChecklist(productId);
+    const checklistCount = Object.values(checklist).filter(v => v === true).length;
+    const checklistTotal = 16;
+
+    // Обновление статистики
+    const approvalsEl = document.getElementById('readiness-approvals');
+    const artifactsEl = document.getElementById('readiness-artifacts');
+    const checklistEl = document.getElementById('readiness-checklist');
+    const totalEl = document.getElementById('readiness-total');
+    const progressFill = document.getElementById('readiness-progress-fill');
+
+    if (approvalsEl) approvalsEl.textContent = `${approvalsCount}/${approvalsTotal}`;
+    if (artifactsEl) artifactsEl.textContent = `${artifactsCount}/${artifactsTotal}`;
+    if (checklistEl) checklistEl.textContent = `${checklistCount}/${checklistTotal}`;
+
+    // Общая готовность (средний процент)
+    const approvalsPercent = (approvalsCount / approvalsTotal) * 100;
+    const artifactsPercent = (artifactsCount / artifactsTotal) * 100;
+    const checklistPercent = (checklistCount / checklistTotal) * 100;
+    const totalPercent = Math.round((approvalsPercent + artifactsPercent + checklistPercent) / 3);
+
+    if (totalEl) totalEl.textContent = `${totalPercent}%`;
+
+    if (progressFill) {
+        progressFill.style.width = `${totalPercent}%`;
+        progressFill.textContent = totalPercent >= 10 ? `${totalPercent}%` : '';
+
+        // Изменение цвета в зависимости от готовности
+        if (totalPercent < 33) {
+            progressFill.style.background = 'linear-gradient(90deg, #f44336, #d32f2f)'; // красный
+        } else if (totalPercent < 66) {
+            progressFill.style.background = 'linear-gradient(90deg, #FF9800, #F57C00)'; // оранжевый
+        } else if (totalPercent < 100) {
+            progressFill.style.background = 'linear-gradient(90deg, #2196F3, #1976D2)'; // синий
+        } else {
+            progressFill.style.background = 'linear-gradient(90deg, #4CAF50, #45a049)'; // зеленый
+        }
+    }
+
+    // Обновление счетчиков категорий чеклиста
+    updateChecklistCategoryCounters();
+}
+
+// Обновление счетчиков по категориям чеклиста
+function updateChecklistCategoryCounters() {
+    const categories = {
+        'business': { total: 4, checked: 0, color: '#2196F3' },
+        'financial': { total: 4, checked: 0, color: '#FF9800' },
+        'documents': { total: 4, checked: 0, color: '#9C27B0' },
+        'system': { total: 4, checked: 0, color: '#4CAF50' }
+    };
+
+    // Подсчет отмеченных пунктов
+    document.querySelectorAll('.checklist-checkbox').forEach(checkbox => {
+        const category = checkbox.dataset.category;
+        if (category && categories[category]) {
+            if (checkbox.checked) {
+                categories[category].checked++;
+            }
+        }
+    });
+
+    // Обновление заголовков категорий
+    const headers = document.querySelectorAll('.checklist-category-header');
+    headers.forEach((header, index) => {
+        const categoryKeys = Object.keys(categories);
+        if (index < categoryKeys.length) {
+            const categoryKey = categoryKeys[index];
+            const category = categories[categoryKey];
+            const text = header.textContent;
+            const newText = text.replace(/\(\d+\/\d+\)/, `(${category.checked}/${category.total})`);
+            header.textContent = newText;
+        }
+    });
 }
 
 // ========== GLOBAL FUNCTIONS (for onclick handlers) ==========
