@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Система управления страховыми продуктами - MVP</title>
-    <link rel="stylesheet" href="styles.css">
+
+    <!-- Отключение кеширования для разработки -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <link rel="stylesheet" href="styles.css?v=20251229-01">
 </head>
 <body>
     <!-- Модальное окно выбора роли -->
@@ -2436,7 +2442,30 @@
     <!-- Уведомления -->
     <div id="toast-container"></div>
 
-    <script src="testData.js"></script>
-    <script src="app.js"></script>
+    <script src="testData.js?v=20251229-01"></script>
+    <script src="app.js?v=20251229-01"></script>
+
+    <!-- Скрипт для автоматического обновления при изменениях -->
+    <script>
+        // Проверка версии приложения
+        const APP_VERSION = '20251229-01';
+        const STORED_VERSION = localStorage.getItem('app_version');
+
+        if (STORED_VERSION && STORED_VERSION !== APP_VERSION) {
+            console.log('🔄 Обнаружена новая версия. Очистка кеша...');
+            // Очистка Service Worker cache (если есть)
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => caches.delete(name));
+                });
+            }
+            // Обновление версии
+            localStorage.setItem('app_version', APP_VERSION);
+            // Hard reload
+            window.location.reload(true);
+        } else if (!STORED_VERSION) {
+            localStorage.setItem('app_version', APP_VERSION);
+        }
+    </script>
 </body>
 </html>
