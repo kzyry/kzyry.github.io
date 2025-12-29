@@ -1,7 +1,7 @@
 // ========== STATE MANAGEMENT ==========
 let currentUser = {
     name: '',
-    role: '', // 'Продуктолог' | 'Андеррайтер' | 'Актуарий' | 'Методолог' | 'Юрист' | 'Финансист'
+    role: '', // 'Продуктолог' | 'Андеррайтер' | 'Актуарий' | 'Методолог'
     canEdit: function(fieldOwner) {
         return this.role === fieldOwner;
     }
@@ -373,9 +373,7 @@ function approveByRole(product, role, comment = '') {
             'Продуктолог': { approved: false, comment: '', date: null },
             'Андеррайтер': { approved: false, comment: '', date: null },
             'Актуарий': { approved: false, comment: '', date: null },
-            'Методолог': { approved: false, comment: '', date: null },
-            'Юрист': { approved: false, comment: '', date: null },
-            'Финансист': { approved: false, comment: '', date: null }
+            'Методолог': { approved: false, comment: '', date: null }
         };
     }
 
@@ -465,9 +463,7 @@ function renderApprovalPanel(product) {
         'Продуктолог': 'productolog',
         'Андеррайтер': 'underwriter',
         'Актуарий': 'actuary',
-        'Методолог': 'methodologist',
-        'Юрист': 'lawyer',
-        'Финансист': 'financier'
+        'Методолог': 'methodologist'
     };
 
     Object.keys(roleMap).forEach(role => {
@@ -3515,7 +3511,7 @@ function renderRolesStatus(product) {
     const roles = [
         { name: 'Продуктолог', person: 'Иван Иванов', status: progress > 80 ? 'completed' : progress > 40 ? 'pending' : 'not-started' },
         { name: 'Риск-менеджер', person: 'Мария Петрова', status: progress > 60 ? 'completed' : progress > 30 ? 'pending' : 'not-started' },
-        { name: 'Юрист', person: 'Алексей Сидоров', status: progress > 70 ? 'completed' : 'not-started' },
+        { name: 'Методолог', person: 'Алексей Сидоров', status: progress > 70 ? 'completed' : 'not-started' },
         { name: 'Руководитель', person: 'Ольга Иванова', status: product.status === 'Согласовано' || product.status === 'Отправлено в ЦБ' ? 'completed' : 'not-started' }
     ];
 
@@ -3697,9 +3693,7 @@ function loadTestData() {
             'Продуктолог': { approved: false, comment: '', date: null },
             'Андеррайтер': { approved: false, comment: '', date: null },
             'Актуарий': { approved: false, comment: '', date: null },
-            'Методолог': { approved: false, comment: '', date: null },
-            'Юрист': { approved: false, comment: '', date: null },
-            'Финансист': { approved: false, comment: '', date: null }
+            'Методолог': { approved: false, comment: '', date: null }
         },
         data: {
             priority: 'Высокий',
@@ -3750,9 +3744,7 @@ function loadTestData() {
             'Продуктолог': { approved: false, comment: '', date: null },
             'Андеррайтер': { approved: false, comment: '', date: null },
             'Актуарий': { approved: false, comment: '', date: null },
-            'Методолог': { approved: false, comment: '', date: null },
-            'Юрист': { approved: false, comment: '', date: null },
-            'Финансист': { approved: false, comment: '', date: null }
+            'Методолог': { approved: false, comment: '', date: null }
         },
         data: {
             priority: 'Средний',
@@ -3880,9 +3872,7 @@ function loadTestData() {
             'Продуктолог': { approved: true, comment: 'Согласовано. Продукт актуален для рынка.', date: new Date(now - 86400000 * 8).toISOString() },
             'Андеррайтер': { approved: true, comment: 'Риски оценены, параметры корректны.', date: new Date(now - 86400000 * 6).toISOString() },
             'Актуарий': { approved: false, comment: '', date: null },
-            'Методолог': { approved: false, comment: '', date: null },
-            'Юрист': { approved: false, comment: '', date: null },
-            'Финансист': { approved: false, comment: '', date: null }
+            'Методолог': { approved: false, comment: '', date: null }
         },
         data: {
             priority: 'Высокий',
@@ -3933,9 +3923,7 @@ function loadTestData() {
             'Продуктолог': { approved: true, comment: 'Автоматическое согласование при отправке', date: new Date(now - 86400000 * 4).toISOString() },
             'Андеррайтер': { approved: false, comment: '', date: null },
             'Актуарий': { approved: false, comment: '', date: null },
-            'Методолог': { approved: false, comment: '', date: null },
-            'Юрист': { approved: false, comment: '', date: null },
-            'Финансист': { approved: false, comment: '', date: null }
+            'Методолог': { approved: false, comment: '', date: null }
         },
         data: {
             priority: 'Низкий',
@@ -3986,9 +3974,7 @@ function loadTestData() {
             'Продуктолог': { approved: true, comment: 'Продукт соответствует стратегии компании.', date: new Date(now - 86400000 * 12).toISOString() },
             'Андеррайтер': { approved: true, comment: 'Андеррайтинговые правила утверждены.', date: new Date(now - 86400000 * 10).toISOString() },
             'Актуарий': { approved: true, comment: 'Тарифы рассчитаны и проверены.', date: new Date(now - 86400000 * 5).toISOString() },
-            'Методолог': { approved: true, comment: 'Документация подготовлена в полном объеме.', date: new Date(now - 86400000 * 1).toISOString() },
-            'Юрист': { approved: true, comment: 'Правовая экспертиза завершена.', date: new Date(now - 86400000 * 3).toISOString() },
-            'Финансист': { approved: true, comment: 'Финансовая модель утверждена.', date: new Date(now - 86400000 * 7).toISOString() }
+            'Методолог': { approved: true, comment: 'Документация подготовлена в полном объеме.', date: new Date(now - 86400000 * 1).toISOString() }
         },
         data: {
             priority: 'Высокий',
@@ -4039,9 +4025,7 @@ function loadTestData() {
             'Продуктолог': { approved: true, comment: 'Согласовано.', date: new Date(now - 86400000 * 25).toISOString() },
             'Андеррайтер': { approved: true, comment: 'Согласовано.', date: new Date(now - 86400000 * 23).toISOString() },
             'Актуарий': { approved: true, comment: 'Согласовано.', date: new Date(now - 86400000 * 20).toISOString() },
-            'Методолог': { approved: true, comment: 'Согласовано.', date: new Date(now - 86400000 * 18).toISOString() },
-            'Юрист': { approved: true, comment: 'Согласовано.', date: new Date(now - 86400000 * 22).toISOString() },
-            'Финансист': { approved: true, comment: 'Согласовано.', date: new Date(now - 86400000 * 24).toISOString() }
+            'Методолог': { approved: true, comment: 'Согласовано.', date: new Date(now - 86400000 * 18).toISOString() }
         },
         data: {
             priority: 'Высокий',
@@ -4092,9 +4076,7 @@ function loadTestData() {
             'Продуктолог': { approved: true, comment: 'Продукт востребован на рынке.', date: new Date(now - 86400000 * 10).toISOString() },
             'Андеррайтер': { approved: true, comment: 'Риски приемлемы.', date: new Date(now - 86400000 * 8).toISOString() },
             'Актуарий': { approved: true, comment: 'Тарификация выполнена корректно.', date: new Date(now - 86400000 * 5).toISOString() },
-            'Методолог': { approved: false, comment: '', date: null },
-            'Юрист': { approved: false, comment: '', date: null },
-            'Финансист': { approved: true, comment: 'Финансовая модель проверена.', date: new Date(now - 86400000 * 6).toISOString() }
+            'Методолог': { approved: false, comment: '', date: null }
         },
         data: {
             priority: 'Средний',
@@ -4145,9 +4127,7 @@ function loadTestData() {
             'Продуктолог': { approved: false, comment: '', date: null },
             'Андеррайтер': { approved: false, comment: '', date: null },
             'Актуарий': { approved: false, comment: '', date: null },
-            'Методолог': { approved: false, comment: '', date: null },
-            'Юрист': { approved: false, comment: '', date: null },
-            'Финансист': { approved: false, comment: '', date: null }
+            'Методолог': { approved: false, comment: '', date: null }
         },
         data: {
             priority: 'Средний',
@@ -4730,7 +4710,7 @@ function initRedemptionCalculator() {
 
 // Типы артефактов
 const ARTIFACT_TYPES = {
-    rules: { name: 'Правила страхования', responsible: 'Юрист' },
+    rules: { name: 'Правила страхования', responsible: 'Методолог' },
     kid: { name: 'KID', responsible: 'Продуктолог' },
     investment: { name: 'Инвестиционная декларация', responsible: 'Актуарий' },
     memo: { name: 'Служебная записка', responsible: 'Продуктолог' },
