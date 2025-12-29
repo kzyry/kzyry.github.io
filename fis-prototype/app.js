@@ -32,6 +32,17 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUser = JSON.parse(savedUser);
         hideLoginModal();
         initApp();
+
+        // Force product restoration after full init
+        const savedProductId = localStorage.getItem('currentProductId');
+        if (savedProductId) {
+            console.log('[DOMContentLoaded] Found saved product, will restore:', savedProductId);
+            // Extra delay to ensure everything is initialized
+            setTimeout(() => {
+                console.log('[DOMContentLoaded] Forcing product restoration now');
+                restoreCurrentProduct();
+            }, 2000);
+        }
     } else {
         showLoginModal();
     }
@@ -56,14 +67,14 @@ function initApp() {
     applyRoleBasedAccess();
     updateNotificationBadge(); // Update notification badge on app init
 
-    // Restore current product after page reload
-    restoreCurrentProduct();
+    // NOTE: Product restoration moved to DOMContentLoaded for better timing
 }
 
 // Restore current product from localStorage after page reload
 function restoreCurrentProduct() {
     const savedProductId = localStorage.getItem('currentProductId');
     console.log('Restoring product, savedProductId:', savedProductId);
+    console.log('Available products:', AppState.products);
 
     if (savedProductId) {
         const productId = parseInt(savedProductId);
@@ -71,9 +82,8 @@ function restoreCurrentProduct() {
         console.log('Found product:', product);
 
         if (product) {
-            // Wait for DOM to be fully ready
-            setTimeout(() => {
-                console.log('Attempting to restore product view for id:', productId);
+            // Direct restoration without extra delay since we're already delayed from DOMContentLoaded
+            console.log('Attempting to restore product view for id:', productId);
 
                 // Manually set the current product
                 AppState.currentProduct = product;
@@ -147,7 +157,6 @@ function restoreCurrentProduct() {
                         console.log('ERROR: Approval panel not found!');
                     }
                 }, 300);
-            }, 1000); // Increased delay to ensure DOM is ready
         } else {
             // Product not found, clear saved ID
             console.log('Product not found, clearing localStorage');
