@@ -63,18 +63,98 @@ function initApp() {
 // Restore current product from localStorage after page reload
 function restoreCurrentProduct() {
     const savedProductId = localStorage.getItem('currentProductId');
+    console.log('Restoring product, savedProductId:', savedProductId);
+
     if (savedProductId) {
         const productId = parseInt(savedProductId);
         const product = AppState.products.find(p => p.id === productId);
+        console.log('Found product:', product);
+
         if (product) {
-            // Automatically reopen the product
+            // Wait for DOM to be fully ready
             setTimeout(() => {
-                editProduct(productId);
-            }, 100);
+                console.log('Attempting to restore product view for id:', productId);
+
+                // Manually set the current product
+                AppState.currentProduct = product;
+
+                // Load product data into form
+                loadProductData(product.data);
+
+                // Force switch to product-edit page
+                console.log('Switching to product-edit page');
+                document.querySelectorAll('.page').forEach(p => {
+                    p.classList.remove('active');
+                    console.log('Removed active from:', p.id);
+                });
+
+                const editPage = document.getElementById('product-edit-page');
+                if (editPage) {
+                    editPage.classList.add('active');
+                    console.log('Added active to product-edit-page');
+                } else {
+                    console.log('ERROR: product-edit-page not found!');
+                }
+
+                // Update navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                // Set product title
+                const productTitle = document.getElementById('product-title');
+                if (productTitle) {
+                    productTitle.textContent = product.data.marketingName || 'Редактирование продукта';
+                }
+
+                // Ensure approval panel and readiness section are visible
+                setTimeout(() => {
+                    console.log('Making approval panel and readiness section visible');
+
+                    // Apply role-based access
+                    applyRoleBasedAccess();
+                    updateApprovalButton(product);
+
+                    // Show approval panel
+                    const panel = document.getElementById('approval-panel');
+                    if (panel) {
+                        panel.style.display = 'block';
+                        console.log('Approval panel made visible');
+
+                        // Ensure launch readiness section is visible
+                        const readinessSection = panel.querySelector('.launch-readiness-section');
+                        if (readinessSection) {
+                            readinessSection.style.display = 'block';
+                            console.log('Readiness section made visible');
+                        } else {
+                            console.log('ERROR: Readiness section not found!');
+                        }
+
+                        // Render the panel content
+                        renderApprovalPanel(product);
+
+                        // Initialize handlers
+                        initArtifactsHandlers(product.id);
+                        initLaunchChecklist(product.id);
+
+                        // Block editing if needed
+                        if (product.status === 'sent_to_cb') {
+                            blockProductEditing();
+                        }
+
+                        console.log('Product restoration complete');
+                    } else {
+                        console.log('ERROR: Approval panel not found!');
+                    }
+                }, 300);
+            }, 1000); // Increased delay to ensure DOM is ready
         } else {
             // Product not found, clear saved ID
+            console.log('Product not found, clearing localStorage');
             localStorage.removeItem('currentProductId');
         }
+    } else {
+        console.log('No saved product ID');
     }
 }
 
@@ -141,6 +221,7 @@ function logout() {
 
     // Remove from LocalStorage
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('currentProductId');
 
     // Reset filters
     AppState.filters = {
@@ -823,6 +904,8 @@ function initNavigation() {
             const page = item.dataset.page;
 
             if (page === 'dashboard') {
+                localStorage.removeItem('currentProductId');
+                AppState.currentProduct = null;
                 switchPage('dashboard');
             } else if (page === 'archive') {
                 switchPage('archive');
