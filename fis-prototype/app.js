@@ -527,7 +527,8 @@ function renderFillingProgress(product) {
                 hasValue = checked.length > 0;
             } else if (fieldInfo.type === 'editor') {
                 const editor = document.getElementById(fieldInfo.id);
-                hasValue = editor && editor.value && editor.value.trim() !== '';
+                // Для contenteditable div проверяем innerHTML, а не value
+                hasValue = editor && editor.innerHTML && editor.innerHTML.trim() !== '';
             } else {
                 const field = document.getElementById(fieldInfo.id);
                 hasValue = field && field.value && field.value.trim() !== '';
@@ -934,11 +935,34 @@ function initFormHandlers() {
     document.querySelectorAll('#business-context-tab input, #business-context-tab select').forEach(field => {
         field.addEventListener('input', () => {
             triggerAutosave();
+            updateFillingProgress(); // Обновить прогресс заполнения
         });
     });
 
+    // Отслеживание изменений в чекбоксах
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            updateFillingProgress(); // Обновить прогресс при изменении чекбоксов
+        });
+    });
+
+    // Отслеживание изменений в WYSIWYG редакторе
+    const templateEditor = document.getElementById('template-editor');
+    if (templateEditor) {
+        templateEditor.addEventListener('input', () => {
+            updateFillingProgress(); // Обновить прогресс при изменении шаблона
+        });
+    }
+
     // Валидация обязательных чекбокс-групп (визуальная индикация)
     initRequiredCheckboxGroupsValidation();
+}
+
+// Функция для обновления прогресса заполнения
+function updateFillingProgress() {
+    if (AppState.currentProduct && AppState.currentProduct.status === 'draft') {
+        renderFillingProgress(AppState.currentProduct);
+    }
 }
 
 function initRequiredCheckboxGroupsValidation() {
@@ -1880,9 +1904,9 @@ function validateProduct(roleToValidate = null) {
                 const checked = getSelectedValues(`input[name="${fieldInfo.id}"]`);
                 isEmpty = checked.length === 0;
             } else if (fieldInfo.type === 'editor') {
-                // Check WYSIWYG editor
+                // Check WYSIWYG editor (contenteditable div)
                 const editor = document.getElementById(fieldInfo.id);
-                isEmpty = !editor || !editor.value || editor.value.trim() === '';
+                isEmpty = !editor || !editor.innerHTML || editor.innerHTML.trim() === '';
             } else {
                 // Check regular input/select
                 const field = document.getElementById(fieldInfo.id);
