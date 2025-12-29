@@ -55,6 +55,27 @@ function initApp() {
     updateUserProfile();
     applyRoleBasedAccess();
     updateNotificationBadge(); // Update notification badge on app init
+
+    // Restore current product after page reload
+    restoreCurrentProduct();
+}
+
+// Restore current product from localStorage after page reload
+function restoreCurrentProduct() {
+    const savedProductId = localStorage.getItem('currentProductId');
+    if (savedProductId) {
+        const productId = parseInt(savedProductId);
+        const product = AppState.products.find(p => p.id === productId);
+        if (product) {
+            // Automatically reopen the product
+            setTimeout(() => {
+                editProduct(productId);
+            }, 100);
+        } else {
+            // Product not found, clear saved ID
+            localStorage.removeItem('currentProductId');
+        }
+    }
 }
 
 // ========== AUTHENTICATION ==========
@@ -2205,6 +2226,7 @@ function editProduct(id) {
     if (!product) return;
 
     AppState.currentProduct = product;
+    localStorage.setItem('currentProductId', id);
     loadProductData(product.data);
     switchPage('product-edit');
     document.getElementById('product-title').textContent = product.data.marketingName || 'Редактирование продукта';
