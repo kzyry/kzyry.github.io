@@ -470,9 +470,21 @@ function renderApprovalPanel(product) {
     // Always show approval panel
     panel.style.display = 'block';
 
-    // Show filling progress for "draft" status
+    // Ensure launch readiness section is visible
+    const readinessSection = panel.querySelector('.launch-readiness-section');
+    if (readinessSection) {
+        readinessSection.style.display = 'block';
+    }
+
+    // Show filling progress for "draft" status ONLY
     if (product.status === 'draft') {
         renderFillingProgress(product);
+    } else {
+        // Remove filling progress section for non-draft products
+        const existingProgress = panel.querySelector('.filling-progress-section');
+        if (existingProgress) {
+            existingProgress.remove();
+        }
     }
 
     // Update launch readiness metrics
