@@ -29,7 +29,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check if user is logged in
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
-        currentUser = JSON.parse(savedUser);
+        const userData = JSON.parse(savedUser);
+        currentUser = {
+            name: userData.name,
+            role: userData.role,
+            canEdit: function(fieldOwner) {
+                return this.role === fieldOwner;
+            }
+        };
         hideLoginModal();
         initApp();
 
