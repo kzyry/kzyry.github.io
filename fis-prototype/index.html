@@ -10,7 +10,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
-    <link rel="stylesheet" href="styles.css?v=20251229-03">
+    <link rel="stylesheet" href="styles.css?v=20251229-04">
 </head>
 <body>
     <!-- Модальное окно выбора роли -->
@@ -972,8 +972,8 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="agency-code">Код Агентского договора (АД)</label>
-                                <input type="text" id="agency-code" data-role-owner="Продуктолог" pattern="[0-9]{5,6}" maxlength="6" placeholder="115870">
+                                <label for="agency-code">Код Агентского договора (АД) *</label>
+                                <input type="text" id="agency-code" data-role-owner="Продуктолог" pattern="[0-9]{5,6}" maxlength="6" placeholder="115870" required>
                             </div>
 
                             <div class="form-group">
@@ -991,13 +991,13 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="product-code">Код продукта</label>
-                                <input type="text" id="product-code" data-role-owner="Продуктолог" maxlength="20" placeholder="IBGVTBROZ">
+                                <label for="product-code">Код продукта *</label>
+                                <input type="text" id="product-code" data-role-owner="Продуктолог" maxlength="20" placeholder="IBGVTBROZ" required>
                             </div>
 
                             <div class="form-group">
-                                <label for="lk-card-type">Тип карточки в ЛК</label>
-                                <select id="lk-card-type" data-role-owner="Продуктолог">
+                                <label for="lk-card-type">Тип карточки в ЛК *</label>
+                                <select id="lk-card-type" data-role-owner="Продуктолог" required>
                                     <option value="">Выберите тип</option>
                                     <option value="Новая карточка">Новая карточка</option>
                                     <option value="Базис Актив">Базис Актив</option>
@@ -1060,8 +1060,8 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="insurance-rules">Правила страхования</label>
-                                <input type="text" id="insurance-rules" data-role-owner="Методолог" placeholder="№2 (в редакции от 01 апреля 2023 года)">
+                                <label for="insurance-rules">Правила страхования *</label>
+                                <input type="text" id="insurance-rules" data-role-owner="Методолог" placeholder="№2 (в редакции от 01 апреля 2023 года)" required>
                             </div>
                                 </div>
                             </section>
@@ -1103,8 +1103,8 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="llob">Линия бизнеса (LLOB)</label>
-                                        <select id="llob" data-role-owner="Актуарий">
+                                        <label for="llob">Линия бизнеса (LLOB) *</label>
+                                        <select id="llob" data-role-owner="Актуарий" required>
                                             <option value="">Выберите LLOB</option>
                                             <option value="10800">10800</option>
                                             <option value="20700">20700</option>
@@ -2442,13 +2442,13 @@
     <!-- Уведомления -->
     <div id="toast-container"></div>
 
-    <script src="testData.js?v=20251229-03"></script>
-    <script src="app.js?v=20251229-03"></script>
+    <script src="testData.js?v=20251229-04"></script>
+    <script src="app.js?v=20251229-04"></script>
 
     <!-- Скрипт для автоматического обновления при изменениях -->
     <script>
         // Проверка версии приложения с агрессивной очисткой кеша
-        const APP_VERSION = '20251229-03'; // ОБНОВИТЬ ПРИ КАЖДОМ ДЕПЛОЕ!
+        const APP_VERSION = '20251229-04'; // ОБНОВИТЬ ПРИ КАЖДОМ ДЕПЛОЕ!
         const STORED_VERSION = localStorage.getItem('app_version');
         const LAST_CHECK = localStorage.getItem('last_version_check');
         const now = Date.now();

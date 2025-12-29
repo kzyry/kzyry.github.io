@@ -936,6 +936,44 @@ function initFormHandlers() {
             triggerAutosave();
         });
     });
+
+    // Валидация обязательных чекбокс-групп (визуальная индикация)
+    initRequiredCheckboxGroupsValidation();
+}
+
+function initRequiredCheckboxGroupsValidation() {
+    // Список обязательных чекбокс-групп по именам
+    const requiredCheckboxGroups = ['currency', 'frequency', 'payment-frequencies'];
+
+    // Функция проверки и обновления визуальной индикации
+    function validateCheckboxGroup(groupName) {
+        const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+        const container = checkboxes[0]?.closest('.multi-select-container');
+
+        if (!container) return;
+
+        const hasChecked = Array.from(checkboxes).some(cb => cb.checked);
+
+        if (hasChecked) {
+            container.classList.remove('required-invalid');
+        } else {
+            container.classList.add('required-invalid');
+        }
+    }
+
+    // Добавить слушатели изменений для всех чекбоксов в обязательных группах
+    requiredCheckboxGroups.forEach(groupName => {
+        const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                validateCheckboxGroup(groupName);
+            });
+        });
+
+        // Начальная валидация при загрузке
+        validateCheckboxGroup(groupName);
+    });
 }
 
 // ========== DYNAMIC TABLES ==========
@@ -2188,6 +2226,13 @@ function loadProductData(data) {
             if (checkbox) checkbox.checked = true;
         });
     }
+
+    // Обновить визуальную валидацию чекбокс-групп после загрузки данных
+    setTimeout(() => {
+        if (typeof initRequiredCheckboxGroupsValidation === 'function') {
+            initRequiredCheckboxGroupsValidation();
+        }
+    }, 50);
 
     // Trigger conditional displays
     document.getElementById('partner').dispatchEvent(new Event('change'));
