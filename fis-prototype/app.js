@@ -470,107 +470,13 @@ function renderApprovalPanel(product) {
     // Always show approval panel
     panel.style.display = 'block';
 
-    const roleMap = {
-        'Продуктолог': 'productolog',
-        'Андеррайтер': 'underwriter',
-        'Актуарий': 'actuary',
-        'Методолог': 'methodologist'
-    };
-
-    Object.keys(roleMap).forEach(role => {
-        const statusEl = document.getElementById(`approval-status-${roleMap[role]}`);
-        const actionsEl = document.getElementById(`approval-actions-${roleMap[role]}`);
-        const cardEl = statusEl?.closest('.approval-card');
-
-        if (!product.approvals || !product.approvals[role]) return;
-
-        const approval = product.approvals[role];
-
-        // Remove previous highlight
-        if (cardEl) {
-            cardEl.classList.remove('current-user-card');
-        }
-
-        if (approval.approved) {
-            statusEl.innerHTML = `<span style="color: var(--accent-green);">✓ Согласовано</span><br><small>${approval.comment || ''}</small><br><small>${new Date(approval.date).toLocaleDateString('ru-RU')}</small>`;
-        } else {
-            statusEl.innerHTML = '<span style="color: var(--text-muted);">Ожидает согласования</span>';
-
-            // Highlight current user's card
-            if (currentUser.role === role && cardEl) {
-                cardEl.classList.add('current-user-card');
-            }
-        }
-
-        // Always clear actions
-        if (actionsEl) {
-            actionsEl.innerHTML = '';
-        }
-    });
-
-    // Add return buttons in "approved" status
-    if (product.status === 'approved') {
-        const currentRole = currentUser?.role;
-
-        // For all roles except Продуктолог - show "Request Return" button
-        if (currentRole && currentRole !== 'Продуктолог') {
-            const actionsEl = document.getElementById(`approval-actions-${roleMap[currentRole]}`);
-            if (actionsEl) {
-                actionsEl.innerHTML = `
-                    <button class="btn btn-warning btn-sm" onclick="requestReturnToApproval(${product.id})">
-                        🔄 Попросить вернуть на согласование
-                    </button>
-                `;
-            }
-        }
-
-        // For Продуктолог - show direct "Return" button and return requests
-        if (currentRole === 'Продуктолог') {
-            const actionsEl = document.getElementById(`approval-actions-productolog`);
-            if (actionsEl) {
-                const returnRequests = product.returnRequests || [];
-                const pendingRequests = returnRequests.filter(r => r.status === 'pending');
-
-                let html = `
-                    <button class="btn btn-secondary btn-sm" onclick="returnToApproval(${product.id})">
-                        ← Вернуть на согласование
-                    </button>
-                `;
-
-                // Show pending return requests
-                if (pendingRequests.length > 0) {
-                    html += `<div class="return-requests" style="margin-top: 12px; padding: 12px; background: rgba(255, 152, 0, 0.1); border-left: 3px solid #FF9800; border-radius: 4px;">
-                        <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #FF9800;">⚠️ Запросы на возврат:</h4>
-                        ${pendingRequests.map(r => `
-                            <div style="font-size: 12px; margin-bottom: 6px;">
-                                <strong>${r.role}:</strong> ${r.comment}<br>
-                                <small style="color: var(--text-secondary);">${new Date(r.date).toLocaleString('ru-RU')}</small>
-                            </div>
-                        `).join('')}
-                    </div>`;
-                }
-
-                actionsEl.innerHTML = html;
-            }
-        }
-    }
-
     // Show filling progress for "draft" status
     if (product.status === 'draft') {
         renderFillingProgress(product);
     }
 
-    // Show export button for "sent_to_cb" status (Продуктолог only)
-    if (product.status === 'sent_to_cb' && currentUser?.role === 'Продуктолог') {
-        const actionsEl = document.getElementById('approval-actions-productolog');
-        if (actionsEl) {
-            actionsEl.innerHTML = `
-                <button class="btn btn-primary btn-sm" onclick="exportProductPassport(${product.id})">
-                    📥 Экспортировать паспорт
-                </button>
-            `;
-        }
-    }
+    // Update launch readiness metrics
+    updateLaunchReadiness(product.id);
 }
 
 function renderFillingProgress(product) {
@@ -4965,9 +4871,9 @@ function updateLaunchReadiness(productId) {
     const product = AppState.products.find(p => p.id === productId);
     if (!product) return;
 
-    // 1. Согласования (6 ролей)
+    // 1. Согласования (4 роли: Продуктолог, Андеррайтер, Актуарий, Методолог)
     let approvalsCount = 0;
-    const approvalsTotal = 6;
+    const approvalsTotal = 4;
     if (product.approvals) {
         approvalsCount = Object.values(product.approvals).filter(a => a.approved).length;
     }
