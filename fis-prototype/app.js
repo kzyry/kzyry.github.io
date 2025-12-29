@@ -383,11 +383,22 @@ function approveByRole(product, role, comment = '') {
         date: new Date().toISOString()
     };
 
-    // Check if all approved
+    // Check if all 4 roles approved
     const allApproved = Object.values(product.approvals).every(a => a.approved);
     if (allApproved && product.status === 'approval') {
-        changeStatus(product, 'approved', 'Автоматическое согласование');
-        showToast('Все роли согласовали! Продукт переведен в статус "Согласовано"', 'success');
+        // ВАЖНО: Когда все 4 роли согласовали - сразу в "Отправлено в ЦБ"!
+        changeStatus(product, 'sent_to_cb', 'Все роли согласовали продукт');
+        showToast('🎉 Все роли согласовали! Продукт отправлен в ЦБ', 'success');
+
+        // Add notification about automatic sending to CB
+        const productName = product.data?.marketingName || 'Без названия';
+        addNotification(
+            'status_change',
+            'Продукт отправлен в ЦБ',
+            `Все 4 роли согласовали продукт "${productName}". Автоматически отправлен в Центральный Банк.`,
+            product.id,
+            productName
+        );
     }
 
     saveProducts();
@@ -833,22 +844,27 @@ function handleApprovalButtonClick() {
 
     if (product.status === 'draft') {
         // Send to approval and auto-approve by current role
-        if (validateProduct()) {
+        // ВАЖНО: Валидируем только поля текущей роли!
+        if (validateProduct(currentUser.role)) {
             if (changeStatus(product, 'approval')) {
                 saveProduct('approval');
                 // Auto-approve by current user's role
-                approveByRole(product, currentUser.role, 'Автоматическое согласование при отправке');
+                approveByRole(product, currentUser.role, 'Согласовано');
                 updateApprovalButton(product);
-                showToast('Продукт отправлен на согласование и согласован вами', 'success');
+                showToast('Ваши поля согласованы', 'success');
             }
         }
     } else if (product.status === 'approval') {
-        // Approve by current role
-        const comment = prompt('Комментарий (необязательно):') || '';
-        approveByRole(product, currentUser.role, comment);
-        updateApprovalButton(product);
+        // Approve by current role (if not already approved)
+        // ВАЖНО: Валидируем только поля текущей роли!
+        if (validateProduct(currentUser.role)) {
+            const comment = prompt('Комментарий (необязательно):') || 'Согласовано';
+            approveByRole(product, currentUser.role, comment);
+            updateApprovalButton(product);
+        }
     } else if (product.status === 'approved') {
-        // Send to CB
+        // This status should not be used anymore - goes directly to sent_to_cb
+        // But kept for backwards compatibility
         if (changeStatus(product, 'sent_to_cb')) {
             saveProduct('sent_to_cb');
             updateApprovalButton(product);
@@ -1878,7 +1894,7 @@ function collectFormData() {
     };
 }
 
-function validateProduct() {
+function validateProduct(roleToValidate = null) {
     // Define ALL required fields for ALL roles (согласно ТЗ v3 раздел 6)
     const REQUIRED_FIELDS_BY_ROLE = {
         'Продуктолог': [
@@ -1908,8 +1924,10 @@ function validateProduct() {
 
     const missingFields = [];
 
-    // Check all required fields for all roles
-    for (const [role, fields] of Object.entries(REQUIRED_FIELDS_BY_ROLE)) {
+    // Check required fields ONLY for current role (if specified)
+    const rolesToCheck = roleToValidate ? { [roleToValidate]: REQUIRED_FIELDS_BY_ROLE[roleToValidate] } : REQUIRED_FIELDS_BY_ROLE;
+
+    for (const [role, fields] of Object.entries(rolesToCheck)) {
         for (const fieldInfo of fields) {
             let isEmpty = false;
 
