@@ -154,9 +154,11 @@ function restoreCurrentProduct() {
                         initArtifactsHandlers(product.id);
                         initLaunchChecklist(product.id);
 
-                        // Block editing if needed
+                        // Block editing if needed, otherwise unblock
                         if (product.status === 'sent_to_cb') {
                             blockProductEditing();
+                        } else {
+                            unblockProductEditing();
                         }
 
                         console.log('Product restoration complete');
@@ -883,19 +885,28 @@ function handleApprovalButtonClick() {
         // ВАЖНО: Валидируем только поля текущей роли!
         if (validateProduct(currentUser.role)) {
             if (changeStatus(product, 'approval')) {
-                saveProduct('approval');
-                // Auto-approve by current user's role
+                // ВАЖНО: сначала согласовываем, потом сохраняем!
                 approveByRole(product, currentUser.role, 'Согласовано');
+                saveProduct('approval');
                 updateApprovalButton(product);
-                showToast('Ваши поля согласованы', 'success');
+                showToast('Документ отправлен на согласование и ваши поля согласованы', 'success');
             }
         }
     } else if (product.status === 'approval') {
         // Approve by current role (if not already approved)
+        const currentApproval = product.approvals?.[currentUser.role];
+        const isAlreadyApproved = currentApproval?.approved || false;
+
+        if (isAlreadyApproved) {
+            showToast('Вы уже согласовали этот документ', 'warning');
+            return;
+        }
+
         // ВАЖНО: Валидируем только поля текущей роли!
         if (validateProduct(currentUser.role)) {
-            const comment = prompt('Комментарий (необязательно):') || 'Согласовано';
-            approveByRole(product, currentUser.role, comment);
+            // Убрали prompt - теперь сразу согласовываем без запроса комментария
+            approveByRole(product, currentUser.role, 'Согласовано');
+            saveProduct('approval'); // Сохраняем после согласования
             updateApprovalButton(product);
         }
     } else if (product.status === 'approved') {
@@ -958,6 +969,8 @@ function initNavigation() {
 }
 
 function switchPage(pageName) {
+    console.log('=== switchPage called ===');
+    console.log('Switching to:', pageName);
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(`${pageName}-page`).classList.add('active');
     AppState.currentPage = pageName;
@@ -969,6 +982,12 @@ function switchPage(pageName) {
             item.classList.add('active');
         }
     });
+
+    // Refresh dashboard when switching to it
+    if (pageName === 'dashboard') {
+        console.log('Page is dashboard, calling renderDashboard');
+        renderDashboard();
+    }
 }
 
 // ========== TABS ==========
@@ -1793,48 +1812,80 @@ function exportJSON() {
 
 // ========== PRODUCT MANAGEMENT ==========
 function createNewProduct() {
+    console.log('=== createNewProduct called ===');
     AppState.currentProduct = {
         id: Date.now(),
         status: 'draft',
         createdAt: new Date().toISOString(),
         data: {}
     };
+    console.log('New product created:', AppState.currentProduct);
     clearForm();
     switchPage('product-edit');
     document.getElementById('product-title').textContent = 'Новый продукт';
 
     // Update approval button for new product
     setTimeout(() => {
+        console.log('Unblocking product editing for new product');
+        unblockProductEditing(); // Ensure new product is not locked
         updateApprovalButton(AppState.currentProduct);
         renderApprovalPanel(AppState.currentProduct);
     }, 100);
 }
 
 function saveProduct(status) {
+    console.log('=== saveProduct called ===');
+    console.log('Status:', status);
+    console.log('Current product:', AppState.currentProduct);
+
+    // Check if current product is locked
+    if (AppState.currentProduct && AppState.currentProduct._isLocked) {
+        console.log('Product is locked, cannot save');
+        showToast('⛔ Редактирование запрещено. Документ отправлен в ЦБ', 'error');
+        return false;
+    }
+
     const productData = collectFormData();
+    console.log('Collected form data:', productData);
 
     if (!AppState.currentProduct) {
+        console.log('Creating new product object');
         AppState.currentProduct = {
             id: Date.now(),
             createdAt: new Date().toISOString()
         };
     }
 
+    // Сохраняем approvals, если они есть
+    const existingApprovals = AppState.currentProduct.approvals;
+
     AppState.currentProduct.status = status;
     AppState.currentProduct.data = productData;
     AppState.currentProduct.updatedAt = new Date().toISOString();
+
+    // Восстанавливаем approvals после обновления данных
+    if (existingApprovals) {
+        AppState.currentProduct.approvals = existingApprovals;
+    }
 
     // Update or add to products array
     const existingIndex = AppState.products.findIndex(p => p.id === AppState.currentProduct.id);
     const isNewProduct = existingIndex < 0;
 
+    console.log('Existing index:', existingIndex);
+    console.log('Is new product:', isNewProduct);
+
     if (existingIndex >= 0) {
         AppState.products[existingIndex] = AppState.currentProduct;
+        console.log('Updated existing product at index', existingIndex);
     } else {
         AppState.products.push(AppState.currentProduct);
+        console.log('Added new product, total products:', AppState.products.length);
     }
 
+    console.log('All products:', AppState.products);
     saveProducts();
+    console.log('Saved to localStorage');
 
     // Block 5.3: Log audit entry
     logAuditEntry(
@@ -1856,13 +1907,23 @@ function saveProduct(status) {
 
     showToast(statusText[status] || 'Сохранено', 'success');
     updateAutosaveStatus('сохранено');
+    console.log('=== saveProduct completed ===');
 }
 
 function collectTableData(tableId) {
     const table = document.getElementById(tableId);
-    if (!table) return [];
+    if (!table) {
+        console.log(`Table ${tableId} not found, returning empty array`);
+        return [];
+    }
 
-    const rows = table.querySelectorAll('tbody tr');
+    const tbody = table.querySelector('tbody');
+    if (!tbody) {
+        console.log(`Table ${tableId} has no tbody, returning empty array`);
+        return [];
+    }
+
+    const rows = tbody.querySelectorAll('tr');
     const data = [];
 
     rows.forEach(row => {
@@ -1872,7 +1933,7 @@ function collectTableData(tableId) {
             if (input.type === 'checkbox') {
                 rowData[`col${index}`] = input.checked;
             } else {
-                rowData[`col${index}`] = input.value;
+                rowData[`col${index}`] = input.value || '';
             }
         });
         data.push(rowData);
@@ -1881,63 +1942,71 @@ function collectTableData(tableId) {
     return data;
 }
 
+// Helper function to safely get element value
+function getFieldValue(id) {
+    const element = document.getElementById(id);
+    if (!element) return '';
+    if (element.type === 'checkbox') return element.checked;
+    return element.value;
+}
+
 function collectFormData() {
     return {
-        priority: document.getElementById('priority').value,
-        launchDate: document.getElementById('launch-date').value,
-        closureDate: document.getElementById('closure-date').value,
-        marketingName: document.getElementById('marketing-name').value,
-        partner: document.getElementById('partner').value,
-        newPartnerName: document.getElementById('new-partner-name').value,
-        segment: document.getElementById('segment').value,
-        agencyCode: document.getElementById('agency-code').value,
-        productGroup: document.getElementById('product-group').value,
-        productCode: document.getElementById('product-code').value,
-        lkCardType: document.getElementById('lk-card-type').value,
-        productSubtype: document.getElementById('product-subtype').value,
-        assetLinked: document.getElementById('asset-linked').checked,
-        investmentStrategy: document.getElementById('investment-strategy').checked,
-        llob: document.getElementById('llob').value,
+        priority: getFieldValue('priority'),
+        launchDate: getFieldValue('launch-date'),
+        closureDate: getFieldValue('closure-date'),
+        marketingName: getFieldValue('marketing-name'),
+        partner: getFieldValue('partner'),
+        newPartnerName: getFieldValue('new-partner-name'),
+        segment: getFieldValue('segment'),
+        agencyCode: getFieldValue('agency-code'),
+        productGroup: getFieldValue('product-group'),
+        productCode: getFieldValue('product-code'),
+        lkCardType: getFieldValue('lk-card-type'),
+        productSubtype: getFieldValue('product-subtype'),
+        assetLinked: getFieldValue('asset-linked'),
+        investmentStrategy: getFieldValue('investment-strategy'),
+        llob: getFieldValue('llob'),
         currencies: getSelectedValues('input[name="currency"]'),
         frequencies: getSelectedValues('input[name="frequency"]'),
-        fixedRate: document.getElementById('fixed-rate').checked,
-        exchangeRate: document.getElementById('exchange-rate').value,
-        fixedPremiums: document.getElementById('fixed-premiums').checked,
-        guaranteedIncome: document.getElementById('guaranteed-income').checked,
-        evaluationContract: document.getElementById('evaluation-contract').checked,
-        specialOffer: document.getElementById('special-offer').checked,
+        fixedRate: getFieldValue('fixed-rate'),
+        exchangeRate: getFieldValue('exchange-rate'),
+        fixedPremiums: getFieldValue('fixed-premiums'),
+        guaranteedIncome: getFieldValue('guaranteed-income'),
+        evaluationContract: getFieldValue('evaluation-contract'),
+        specialOffer: getFieldValue('special-offer'),
         // Block 3.1: новые поля
         paymentFrequencies: getSelectedValues('input[name="payment-frequencies"]'),
-        survivalPayoutOption: document.getElementById('survival-payout-option').value,
-        guaranteedPayout: document.getElementById('guaranteed-payout').value,
-        nonPaymentOption: document.getElementById('non-payment-option').checked,
-        allowPremiumCalculation: document.getElementById('allow-premium-calculation').checked,
+        survivalPayoutOption: getFieldValue('survival-payout-option'),
+        guaranteedPayout: getFieldValue('guaranteed-payout'),
+        nonPaymentOption: getFieldValue('non-payment-option'),
+        allowPremiumCalculation: getFieldValue('allow-premium-calculation'),
         // Block 3.1.4: новые поля страхового взноса
-        maxInsuranceSum: document.getElementById('max-insurance-sum').value,
-        maxInsuranceSumApproved: document.getElementById('max-insurance-sum-approved').value,
-        setFixedInsuranceSum: document.getElementById('set-fixed-insurance-sum').checked,
-        disableRiskInsuranceSum: document.getElementById('disable-risk-insurance-sum').checked,
-        useThreePayments: document.getElementById('use-three-payments').checked,
-        freeOptionAvailable: document.getElementById('free-option-available').checked,
-        allowSumCalculation: document.getElementById('allow-sum-calculation').checked,
+        maxInsuranceSum: getFieldValue('max-insurance-sum'),
+        maxInsuranceSumApproved: getFieldValue('max-insurance-sum-approved'),
+        setFixedInsuranceSum: getFieldValue('set-fixed-insurance-sum'),
+        disableRiskInsuranceSum: getFieldValue('disable-risk-insurance-sum'),
+        useThreePayments: getFieldValue('use-three-payments'),
+        freeOptionAvailable: getFieldValue('free-option-available'),
+        allowSumCalculation: getFieldValue('allow-sum-calculation'),
 
         // Параметры: дополнительные поля
-        software: document.getElementById('software').value,
-        contractDuration: document.getElementById('contract-duration').value,
-        contractEffectiveDate: document.getElementById('contract-effective-date').value,
-        paymentDateFormula: document.getElementById('payment-date-formula').value,
-        paperContract: document.getElementById('paper-contract').checked,
-        electronicSignature: document.getElementById('electronic-signature').checked,
+        software: getFieldValue('software'),
+        contractDuration: getFieldValue('contract-duration'),
+        contractEffectiveDate: getFieldValue('contract-effective-date'),
+        paymentDateFormula: getFieldValue('payment-date-formula'),
+        paperContract: getFieldValue('paper-contract'),
+        electronicSignature: getFieldValue('electronic-signature'),
 
         // Андеррайтинг и Кумуляция
-        underwritingRequired: document.getElementById('underwriting-required').value,
-        manualIssue: document.getElementById('manual-issue').value,
-        cumulationDescription: document.getElementById('cumulation-description').value,
+        underwritingRequired: getFieldValue('underwriting-required'),
+        manualIssue: getFieldValue('manual-issue'),
+        cumulationDescription: getFieldValue('cumulation-description'),
         cumulationLimits: collectTableData('cumulation-limits-table'),
 
         // Идентификация продукта
-        contractNumberFormat: document.getElementById('contract-number-format').value,
-        productNumberAlice: document.getElementById('product-number-alice').value,
+        contractNumberFormat: getFieldValue('contract-number-format'),
+        productNumberAlice: getFieldValue('product-number-alice'),
         covers: collectTableData('covers-table'),
         services: collectTableData('services-table'),
 
@@ -1946,39 +2015,39 @@ function collectFormData() {
         insurancePayouts: collectTableData('insurance-payouts-table'),
 
         // Блоки шаблона договора
-        templateContractNumber: document.getElementById('template-contract-number').value,
-        templateContractDate: document.getElementById('template-contract-date').value,
-        templatePolicyholderLastname: document.getElementById('template-policyholder-lastname').value,
-        templatePolicyholderFirstname: document.getElementById('template-policyholder-firstname').value,
-        templatePolicyholderMiddlename: document.getElementById('template-policyholder-middlename').value,
-        templatePolicyholderBirthdate: document.getElementById('template-policyholder-birthdate').value,
-        templatePolicyholderPassport: document.getElementById('template-policyholder-passport').value,
-        templatePolicyholderPhone: document.getElementById('template-policyholder-phone').value,
-        templatePolicyholderAddress: document.getElementById('template-policyholder-address').value,
-        templateInsuredLastname: document.getElementById('template-insured-lastname').value,
-        templateInsuredFirstname: document.getElementById('template-insured-firstname').value,
-        templateInsuredMiddlename: document.getElementById('template-insured-middlename').value,
-        templateInsuredBirthdate: document.getElementById('template-insured-birthdate').value,
-        sameAsPolicyholder: document.getElementById('same-as-policyholder').checked,
+        templateContractNumber: getFieldValue('template-contract-number'),
+        templateContractDate: getFieldValue('template-contract-date'),
+        templatePolicyholderLastname: getFieldValue('template-policyholder-lastname'),
+        templatePolicyholderFirstname: getFieldValue('template-policyholder-firstname'),
+        templatePolicyholderMiddlename: getFieldValue('template-policyholder-middlename'),
+        templatePolicyholderBirthdate: getFieldValue('template-policyholder-birthdate'),
+        templatePolicyholderPassport: getFieldValue('template-policyholder-passport'),
+        templatePolicyholderPhone: getFieldValue('template-policyholder-phone'),
+        templatePolicyholderAddress: getFieldValue('template-policyholder-address'),
+        templateInsuredLastname: getFieldValue('template-insured-lastname'),
+        templateInsuredFirstname: getFieldValue('template-insured-firstname'),
+        templateInsuredMiddlename: getFieldValue('template-insured-middlename'),
+        templateInsuredBirthdate: getFieldValue('template-insured-birthdate'),
+        sameAsPolicyholder: getFieldValue('same-as-policyholder'),
 
         // Новые поля (добавлены 28.12.2025)
-        insuranceType: document.getElementById('insurance-type').value,
-        gracePeriod: document.getElementById('grace-period').value,
-        coolingOffPeriod: document.getElementById('cooling-off-period').value,
+        insuranceType: getFieldValue('insurance-type'),
+        gracePeriod: getFieldValue('grace-period'),
+        coolingOffPeriod: getFieldValue('cooling-off-period'),
 
         // Дополнительные поля Страхователя
-        templatePolicyholderGender: document.getElementById('template-policyholder-gender').value,
-        templatePolicyholderBirthplace: document.getElementById('template-policyholder-birthplace').value,
-        templatePolicyholderCitizenship: document.getElementById('template-policyholder-citizenship').value,
-        templatePolicyholderEmail: document.getElementById('template-policyholder-email').value,
-        templatePolicyholderPassportDate: document.getElementById('template-policyholder-passport-date').value,
-        templatePolicyholderPassportIssued: document.getElementById('template-policyholder-passport-issued').value,
+        templatePolicyholderGender: getFieldValue('template-policyholder-gender'),
+        templatePolicyholderBirthplace: getFieldValue('template-policyholder-birthplace'),
+        templatePolicyholderCitizenship: getFieldValue('template-policyholder-citizenship'),
+        templatePolicyholderEmail: getFieldValue('template-policyholder-email'),
+        templatePolicyholderPassportDate: getFieldValue('template-policyholder-passport-date'),
+        templatePolicyholderPassportIssued: getFieldValue('template-policyholder-passport-issued'),
 
         // Выгодоприобретатели
-        beneficiarySurvivalLastname: document.getElementById('beneficiary-survival-lastname').value,
-        beneficiarySurvivalFirstname: document.getElementById('beneficiary-survival-firstname').value,
-        beneficiarySurvivalMiddlename: document.getElementById('beneficiary-survival-middlename').value,
-        beneficiarySurvivalBirthdate: document.getElementById('beneficiary-survival-birthdate').value,
+        beneficiarySurvivalLastname: getFieldValue('beneficiary-survival-lastname'),
+        beneficiarySurvivalFirstname: getFieldValue('beneficiary-survival-firstname'),
+        beneficiarySurvivalMiddlename: getFieldValue('beneficiary-survival-middlename'),
+        beneficiarySurvivalBirthdate: getFieldValue('beneficiary-survival-birthdate'),
         beneficiariesDeath: collectTableData('beneficiaries-death-table'),
 
         // Выкупные суммы
@@ -1986,8 +2055,8 @@ function collectFormData() {
 
         // Contract template content
         contractTemplate: document.getElementById('template-editor')?.innerHTML || '',
-        contractTemplateSeries: document.getElementById('template-contract-series')?.value || '',
-        contractTemplatePrefix: document.getElementById('template-contract-prefix')?.value || ''
+        contractTemplateSeries: getFieldValue('template-contract-series'),
+        contractTemplatePrefix: getFieldValue('template-contract-prefix')
     };
 }
 
@@ -2128,6 +2197,9 @@ function clearForm() {
 
 // ========== DASHBOARD ==========
 function renderDashboard() {
+    console.log('=== renderDashboard called ===');
+    console.log('Total products in AppState:', AppState.products.length);
+    console.log('Products:', AppState.products);
     updateMetrics();
     renderProductsList();
 }
@@ -2187,18 +2259,27 @@ function getFilteredProducts() {
 }
 
 function renderProductsList() {
+    console.log('=== renderProductsList called ===');
     const listContainer = document.getElementById('products-list');
     const filteredProducts = getFilteredProducts();
 
+    console.log('Filtered products:', filteredProducts.length);
+    console.log('Total products:', AppState.products.length);
+    console.log('Current filters:', AppState.filters);
+
     if (AppState.products.length === 0) {
+        console.log('No products in AppState, showing empty state');
         listContainer.innerHTML = '<div class="empty-state"><p>Нет созданных продуктов. Создайте первый продукт!</p></div>';
         return;
     }
 
     if (filteredProducts.length === 0) {
+        console.log('No filtered products, showing empty state');
         listContainer.innerHTML = '<div class="empty-state"><p>Нет продуктов, соответствующих фильтрам.</p></div>';
         return;
     }
+
+    console.log('Rendering', filteredProducts.length, 'products');
 
     listContainer.innerHTML = filteredProducts.map(product => {
         const statusClass = product.status === 'draft' ? 'draft' :
@@ -2334,9 +2415,11 @@ function editProduct(id) {
         initArtifactsHandlers(product.id);
         initLaunchChecklist(product.id);
 
-        // Block editing if product is sent to CB
+        // Block editing if product is sent to CB, otherwise unblock
         if (product.status === 'sent_to_cb') {
             blockProductEditing();
+        } else {
+            unblockProductEditing();
         }
     }, 200);
 }
@@ -5182,12 +5265,37 @@ function blockProductEditing() {
         productHeader.appendChild(indicator);
     }
 
-    // Override save product function to prevent saving
-    const originalSaveProduct = window.saveProduct;
-    window.saveProduct = function() {
-        showToast('⛔ Редактирование запрещено. Документ отправлен в ЦБ', 'error');
-        return false;
-    };
+    // Mark current product as locked (no global override)
+    if (AppState.currentProduct) {
+        AppState.currentProduct._isLocked = true;
+    }
+}
+
+function unblockProductEditing() {
+    // Unblock all form inputs
+    const formFields = document.querySelectorAll(
+        '#product-form input, ' +
+        '#product-form textarea, ' +
+        '#product-form select, ' +
+        '#product-form button:not(.back-btn)'
+    );
+
+    formFields.forEach(field => {
+        field.disabled = false;
+        field.style.cursor = '';
+        field.style.opacity = '';
+    });
+
+    // Remove lock indicator
+    const lockIndicator = document.querySelector('.status-indicator-locked');
+    if (lockIndicator) {
+        lockIndicator.remove();
+    }
+
+    // Unmark current product as locked
+    if (AppState.currentProduct) {
+        AppState.currentProduct._isLocked = false;
+    }
 }
 
 // ========== GLOBAL FUNCTIONS (for onclick handlers) ==========

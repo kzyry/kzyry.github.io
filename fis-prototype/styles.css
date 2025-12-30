@@ -80,6 +80,7 @@ body {
     padding: 12px 24px;
     color: var(--text-secondary);
     text-decoration: none;
+    cursor: pointer;
     transition: var(--transition);
     border-left: 3px solid transparent;
 }
@@ -199,6 +200,11 @@ body {
 }
 
 /* ========== BUTTONS ========== */
+/* Ensure all button elements have pointer cursor */
+button {
+    cursor: pointer;
+}
+
 .btn {
     padding: 10px 20px;
     border: none;
@@ -478,9 +484,9 @@ body {
     border: none;
     border-bottom: 2px solid transparent;
     color: var(--text-secondary);
+    cursor: pointer;
     font-size: 14px;
     font-weight: 500;
-    cursor: pointer;
     transition: var(--transition);
 }
 
