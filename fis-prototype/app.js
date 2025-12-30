@@ -641,8 +641,7 @@ function renderFillingProgress(product) {
             { id: 'llob', label: 'Линия бизнеса (LLOB)' }
         ],
         'Методолог': [
-            { id: 'template-editor', label: 'Шаблон договора', type: 'editor' },
-            { id: 'insurance-rules', label: 'Правила страхования' }
+            { id: 'template-editor', label: 'Шаблон договора', type: 'editor' }
         ]
     };
 
@@ -1673,7 +1672,6 @@ function previewTemplate() {
         'product.code': document.getElementById('product-code')?.value || 'PRODUCTCODE',
         'product.partner': document.getElementById('partner')?.value || 'Партнёр',
         'product.group': document.getElementById('product-group')?.value || 'Группа продукта',
-        'product.rules': document.getElementById('insurance-rules')?.value || 'Правила страхования',
 
         // Policyholder data
         'policyholder.full_name': getFullName('policyholder'),
@@ -1930,7 +1928,6 @@ function collectFormData() {
         paymentDateFormula: document.getElementById('payment-date-formula').value,
         paperContract: document.getElementById('paper-contract').checked,
         electronicSignature: document.getElementById('electronic-signature').checked,
-        insuranceRules: document.getElementById('insurance-rules').value,
 
         // Андеррайтинг и Кумуляция
         underwritingRequired: document.getElementById('underwriting-required').value,
@@ -2017,8 +2014,7 @@ function validateProduct(roleToValidate = null) {
             { id: 'llob', label: 'Линия бизнеса (LLOB)' }
         ],
         'Методолог': [
-            { id: 'template-editor', label: 'Шаблон договора', type: 'editor' },
-            { id: 'insurance-rules', label: 'Правила страхования' }
+            { id: 'template-editor', label: 'Шаблон договора', type: 'editor' }
         ]
     };
 
@@ -3915,7 +3911,6 @@ function loadTestData() {
             paymentDateFormula: '1 число месяца',
             paperContract: true,
             electronicSignature: true,
-            insuranceRules: 'Стандартные правила страхования жизни',
             // Андеррайтинг и Кумуляция
             underwritingRequired: 'Предусмотрен',
             manualIssue: 'Оформление с согласования',
